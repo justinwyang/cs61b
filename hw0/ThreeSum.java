@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class ThreeSum {
-  public boolean threeSum(int[] a) {
+  public boolean threeSum(int[] a) { // solves the problem in N^2 time
     Arrays.sort(a);
     for (int i = 0; i < a.length; i++) {
       if (valid(i, a)) {

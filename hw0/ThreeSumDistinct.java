@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class ThreeSumDistinct {
-  public boolean threeSumDistinct(int[] a) {
+  public boolean threeSumDistinct(int[] a) { // solves the problem in N^2 time
     Arrays.sort(a);
     for (int i = 0; i < a.length; i++) {
       if (validDistinct(i, a)) {
