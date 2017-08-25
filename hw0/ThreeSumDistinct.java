@@ -3,7 +3,27 @@ import java.util.Arrays;
 public class ThreeSumDistinct {
   public boolean threeSumDistinct(int[] a) {
     Arrays.sort(a);
+    for (int i = 0; i < a.length; i++) {
+      if (validDistinct(i, a)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
+  private boolean validDistinct(int idx, int[] a) {
+    int resid = 0 - a[idx];
+    for (int i = 0, j = a.length - 1; i < j;) {
+      int pairSum = a[i] + a[j];
+      if (pairSum > resid) {
+        j--;
+      } else if (pairSum < resid) {
+        i++;
+      } else {
+        return (i != idx && j != idx);
+      }
+    }
+    return false;
   }
 
   public static void main(String[] args) {
@@ -12,7 +32,7 @@ public class ThreeSumDistinct {
 
     ThreeSumDistinct runner = new ThreeSumDistinct();
     for (int i = 0; i < nums.length; i++) {
-      System.out.println(ThreeSumDistinct.threeSumDistinct(nums[i]));
+      System.out.println(runner.threeSumDistinct(nums[i]));
     }
   }
 }
