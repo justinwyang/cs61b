@@ -3,6 +3,27 @@ import java.util.Arrays;
 public class ThreeSum {
   public boolean threeSum(int[] a) {
     Arrays.sort(a);
+    for (int i = 0; i < a.length; i++) {
+      if (valid(i, a)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean valid(int idx, int[] a) {
+    int resid = 0 - a[idx];
+    for (int i = 0, j = a.length - 1; i <= j;) {
+      int pairSum = a[i] + a[j];
+      if (pairSum > resid) {
+        j--;
+      } else if (pairSum < resid) {
+        i++;
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 
 
