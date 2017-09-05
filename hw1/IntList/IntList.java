@@ -138,8 +138,12 @@ public class IntList {
      *  elements of B.  May modify items of A. Don't use 'new'. */
 
     static IntList dcatenate(IntList A, IntList B) {
-        return null; // REPLACE WITH YOUR CODE */
-
+        IntList curList = A;
+        while(curList.tail != null) {
+            curList = curList.tail;
+        }
+        curList.tail = B;
+        return A;
     }
 
     /* 2b. */
@@ -150,7 +154,10 @@ public class IntList {
       * This method should NOT modify the items in L. */
 
     static IntList subTail(IntList L, int start) {
-        return null; // REPLACE WITH YOUR CODE
+        for(int i = 0; i < start; i++) {
+            L = L.tail;
+        }
+        return new IntList(L.head, L.tail);
     }
 
 
@@ -166,8 +173,14 @@ public class IntList {
      *  that start and len are always >= 0.
      */
     static IntList sublist(IntList L, int start, int len) {
-        return null;  // REPLACE WITH YOUR SOLUTION
-
+        L = subTail(L, start);
+        IntList created = new IntList(L.head, null), head = created, cur = L;
+        for(int i = 1; i < len; i++) {
+            created.tail = new IntList(cur.tail.head, null);
+            created = created.tail;
+            cur = cur.tail;
+        }
+        return head;
     }
 
     /* 2d. */
@@ -178,8 +191,15 @@ public class IntList {
      *  As with sublist, you can assume the items requested
      *  exist, and that START and LEN are >= 0. */
     static IntList dsublist(IntList L, int start, int len) {
-        return null; // REPLACE WITH YOUR SOLUTION
-
+        for(int i = 0; i < start; i++) {
+            L = L.tail;
+        }
+        IntList cur = L;
+        for(int i = 1; i < 4; i++) {
+            cur = cur.tail;
+        }
+        cur.tail = null;
+        return L;
     }
 
 
