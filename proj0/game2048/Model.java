@@ -79,7 +79,19 @@ class Model extends Observable {
         boolean changed;
         changed = false;
 
-        // FIXME
+        for (int col = 0; col < size(); col++) {
+            Tile lastTile = null;
+            for (int row = size() - 1; row >= 0; row--) {
+                if (vtile(col, row, side) == null) {
+                    continue;
+                }
+                Tile curTile = vtile(col, row, side);
+                for (int checkRow = row + 1; checkRow < size(); checkRow++) {
+                    
+                }
+
+            }
+        }
 
         checkGameOver();
         if (changed) {
@@ -116,7 +128,16 @@ class Model extends Observable {
     /** Deternmine whether game is over and update _gameOver and _maxScore
      *  accordingly. */
     private void checkGameOver() {
-        // FIXME
+        for (int row = 0; row < size(); row++) {
+            for (int col = 0; col < size(); col++) {
+                if (tile(col, row) == null) {
+                    return;
+                }
+            }
+        }
+        _gameOver = true;
+        _maxScore = _score;
+        return;
     }
 
     @Override

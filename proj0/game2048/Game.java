@@ -76,7 +76,11 @@ public class Game {
      *  one that fits on the current board. Assumes there is at least one
      *  empty square on the board. */
     private Tile getValidNewTile() {
-        return null; // FIXME
+        Tile get;
+        do {
+            get = _source.getNewTile(_model.size());
+        } while (_model.tile(get.col(), get.row()) != null);
+        return get;
     }
 
     /** Strings representing the four arrow keys. */
