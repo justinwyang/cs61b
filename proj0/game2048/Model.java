@@ -81,7 +81,6 @@ class Model extends Observable {
 
         for (int col = 0; col < size(); col++) {
             Tile prevTile = null;
-
             for (int row = size() - 1, counter = size() - 1; row >= 0; row--) {
                 Tile curTile = vtile(col, row, side);
                 if (curTile == null) {
