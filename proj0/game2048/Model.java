@@ -6,7 +6,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author
+ *  @author Justin Yang
  */
 class Model extends Observable {
 
@@ -80,22 +80,27 @@ class Model extends Observable {
         changed = false;
 
         for (int col = 0; col < size(); col++) {
-            boolean available = false;
-            for (int row = size() - 1, counter = size() - 1; row >= 0; row--, counter++) {
+            Tile prevTile = null;
+
+            for (int row = size() - 1, counter = size() - 1; row >= 0; row--) {
                 Tile curTile = vtile(col, row, side);
                 if (curTile == null) {
                     continue;
                 }
-                if (available && vtile(col, counter + 1, side).value() == curTile.value()) {
+                if (prevTile != null && prevTile.value() == curTile.value()) {
                     setVtile(col, counter + 1, side, curTile);
-                    available = false;
+                    _score += vtile(col, counter + 1, side).value();
+                    prevTile = null;
                     changed = true;
-                } else if (counter != row) {
+                    continue;
+                }
+                Tile atCounter = vtile(col, counter, side);
+                if (atCounter == null) {
                     setVtile(col, counter, side, curTile);
-                    available = true;
-                    counter--;
                     changed = true;
                 }
+                prevTile = vtile(col, counter, side);
+                counter--;
             }
         }
 
@@ -134,11 +139,24 @@ class Model extends Observable {
     /** Deternmine whether game is over and update _gameOver and _maxScore
      *  accordingly. */
     private void checkGameOver() {
+        int[] dr = {0, 0, 1, -1};
+        int[] dc = {1, -1, 0, 0};
         for (int row = 0; row < size(); row++) {
             for (int col = 0; col < size(); col++) {
                 if (tile(col, row) == null) {
-                    return;
+                    continue;
                 }
+                for (int i = 0; i < 4; i++) {
+                    int nr = row + dr[i], nc = col + dc[i];
+                    if (nr < 0 || nr >= size() || nc < 0 || nc >= size()) {
+                        continue;
+                    }
+                    if (tile(nc, nr) == null || tile(col, row).value()
+                            == tile(nc, nr).value()) {
+                        return;
+                    }
+                }
+
             }
         }
         _gameOver = true;

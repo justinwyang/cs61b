@@ -11,6 +11,15 @@ public class BuggyIntDListSolution extends IntDList {
     /** Removes value #I in this list, where item 0 is the first, 1 is the
      *  second, ...., -1 is the last, -2 the second to last.... */
     public void remove(int i) {
+        if (_front == _back) {
+            _front = _back = null;
+            return;
+        }
+        if (i == 0 || i == -size()) {
+            _front = _front._next;
+            _front._prev = null;
+            return;
+        }
         DNode p;
         if (i >= 0) {
             p = _front;

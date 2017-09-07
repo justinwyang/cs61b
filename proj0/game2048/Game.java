@@ -3,7 +3,8 @@ package game2048;
 import static game2048.Side.*;
 
 /** The input/output and GUI controller for play of a game of 2048.
- *  @author */
+ *  @author Justin Yang
+ */
 public class Game {
 
     /** Controller for a game represented by MODEL, using SOURCE as the
@@ -41,7 +42,8 @@ public class Game {
                     return;
                 case "New Game":
                     return;
-                case "Up": case "Down": case "Left": case "Right":
+                case "Up": case "Down": case "Left": case "Right": case "↑":
+                case "↓": case "←": case "→":
                     if (!_model.gameOver() && _model.tilt(keyToSide(cmnd))) {
                         _model.notifyObservers();
                         moved = true;
@@ -59,13 +61,13 @@ public class Game {
      *  or "Right"). */
     private Side keyToSide(String key) {
         switch (key) {
-        case "Up":
+        case "Up": case "↑":
             return NORTH;
-        case "Down":
+        case "Down": case "↓":
             return SOUTH;
-        case "Left":
+        case "Left": case "←":
             return WEST;
-        case "Right":
+        case "Right": case "→":
             return EAST;
         default:
             throw new IllegalArgumentException("unknown key designation");
