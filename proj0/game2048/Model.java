@@ -80,16 +80,22 @@ class Model extends Observable {
         changed = false;
 
         for (int col = 0; col < size(); col++) {
-            Tile lastTile = null;
-            for (int row = size() - 1; row >= 0; row--) {
-                if (vtile(col, row, side) == null) {
+            boolean available = false;
+            for (int row = size() - 1, counter = size() - 1; row >= 0; row--, counter++) {
+                Tile curTile = vtile(col, row, side);
+                if (curTile == null) {
                     continue;
                 }
-                Tile curTile = vtile(col, row, side);
-                for (int checkRow = row + 1; checkRow < size(); checkRow++) {
-                    
+                if (available && vtile(col, counter + 1, side).value() == curTile.value()) {
+                    setVtile(col, counter + 1, side, curTile);
+                    available = false;
+                    changed = true;
+                } else if (counter != row) {
+                    setVtile(col, counter, side, curTile);
+                    available = true;
+                    counter--;
+                    changed = true;
                 }
-
             }
         }
 

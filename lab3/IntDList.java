@@ -27,36 +27,80 @@ public class IntDList {
     /** Return value #I in this list, where item 0 is the first, 1 is the
      *  second, ...., -1 is the last, -2 the second to last.... */
     public int get(int i) {
-        return 0;   // Your code here
+        if (i < 0) {
+            i = i + size();
+        }
+
+        DNode cur;
+        cur = _front;
+        for (int j = 0; j < i; j++) {
+            cur = cur._next;
+        }
+
+        return cur._val;
     }
 
     /** The length of this list. */
     public int size() {
-        return 0;   // Your code here
+        DNode cur = _front;
+        int count = 0;
+        while (cur != null) {
+            cur = cur._next;
+            count++;
+        }
+        return count;
     }
 
     /** Adds D to the front of the IntDList. */
     public void insertFront(int d) {
-        // Your code here 
+        if (_front == null) { /* Empty IntDList */
+            _front = _back = new DNode(null, d, null);
+        } else {
+            _front = new DNode(null, d, _front); /* set the back node*/
+            _front._next._prev = _front;
+        }
     }
 
     /** Adds D to the back of the IntDList. */
     public void insertBack(int d) {
-        // Your code here 
+        if (_front == null) { /* Empty IntDList */
+            _front = _back = new DNode(null, d, null);
+        } else {
+            _back = new DNode(_back, d, null); /* set the back node*/
+            _back._prev._next = _back;
+        }
     }
 
     /** Removes the last item in the IntDList and returns it.
      * This is an extra challenge problem. */
     public int deleteBack() {
-        return 0;   // Your code here
-
+        int val = _back._val;
+        if (_front == _back) {
+            _front = _back = null;
+        } else {
+            _back = _back._prev;
+            _back._next = null;
+        }
+        return val;
     }
 
     /** Returns a string representation of the IntDList in the form
      *  [] (empty list) or [1, 2], etc. 
      * This is an extra challenge problem. */
     public String toString() {
-        return null;   // Your code here
+        if (size() == 0) {
+            return "[]";
+        }
+        String string = "[";
+        DNode cur = _front;
+        while (cur != null) {
+            string += cur._val;
+            if (cur != _back) {
+                string += ", ";
+            }
+            cur = cur._next;
+        }
+        return string + "]";
     }
 
     /* DNode is a "static nested class", because we're only using it inside
