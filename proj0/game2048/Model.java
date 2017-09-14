@@ -140,10 +140,14 @@ class Model extends Observable {
     private void checkGameOver() {
         int[] dr = {0, 0, 1, -1};
         int[] dc = {1, -1, 0, 0};
+        _maxScore = Math.max(_maxScore, _score);
         for (int row = 0; row < size(); row++) {
             for (int col = 0; col < size(); col++) {
                 if (tile(col, row) == null) {
                     continue;
+                } else if (tile(col, row).value() == 2048) {
+                    _gameOver = true;
+                    return;
                 }
                 for (int i = 0; i < 4; i++) {
                     int nr = row + dr[i], nc = col + dc[i];
@@ -159,7 +163,6 @@ class Model extends Observable {
             }
         }
         _gameOver = true;
-        _maxScore = _score;
         return;
     }
 

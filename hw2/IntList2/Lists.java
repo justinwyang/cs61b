@@ -3,8 +3,11 @@
 
 /** HW #2, Problem #1. */
 
+import java.util.Iterator;
+
+
 /** List problem.
- *  @author
+ *  @author Justin Yang
  */
 class Lists {
     /** Return the list of lists formed by breaking up L into "natural runs":
@@ -15,7 +18,25 @@ class Lists {
      *  Destructive: creates no new IntList items, and may modify the
      *  original list pointed to by L. */
     static IntList2 naturalRuns(IntList L) {
-        /* *Replace this body with the solution. */
-        return null;
+        IntList2 list2 = null, cur = null;
+        IntList start = L;
+
+        while (L != null) {
+            if (L.tail != null && L.head > L.tail.head) {
+                IntList2 next = new IntList2(start, null);
+                if (list2 == null) {
+                    cur = list2 = next;
+                } else {
+                    cur.tail = next;
+                    cur = cur.tail;
+                }
+                start = L.tail;
+                L.tail = null;
+                L = start;
+            } else {
+                L = L.tail;
+            }
+        }
+        return list2;
     }
 }
