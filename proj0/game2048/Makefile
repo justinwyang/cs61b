@@ -13,11 +13,16 @@ SHELL = bash
 
 STYLEPROG = style61b
 
+PYTHON = python3
+
 PACKAGE = game2048
+
+# A non-standard classpath that works Linux, Mac, and Windows.
+CPATH = "..:$(CLASSPATH):;..;$(CLASSPATH)"
 
 # Flags to pass to Java compilations (include debugging info and report
 # "unsafe" operations.)
-JFLAGS = -g -Xlint:unchecked -cp ..:$(CLASSPATH) -d .. -encoding utf8
+JFLAGS = -g -Xlint:unchecked -cp $(CPATH) -d .. -encoding utf8
 
 SRCS = $(wildcard *.java)
 
@@ -55,7 +60,7 @@ sentinel: $(SRCS)
 
 # Run Tests.
 check: 
-	make -C .. check
+	make -C .. PYTHON=$(PYTHON) check
 
 # Find and remove all *~ and *.class files.
 clean:

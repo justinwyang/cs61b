@@ -85,11 +85,6 @@ public class Game {
         return get;
     }
 
-    /** Strings representing the four arrow keys. */
-    private static final String[] ARROW_KEYS = {
-        "Up", "Down", "Left", "Right"
-    };
-
     /** The playing board. */
     private Model _model;
 

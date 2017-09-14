@@ -13,6 +13,8 @@
 
 SHELL = /bin/bash
 
+PYTHON = python3
+
 # Flags to Java interpreter: check assertions
 JFLAGS = -ea
 
@@ -20,7 +22,7 @@ JFLAGS = -ea
 MAIN = game2048.Main
 
 # Running the program.
-PROG = java $(JFLAGS) -cp ..:$(CLASSPATH) $(MAIN)
+PROG = java $(JFLAGS) -cp $(CPATH) $(MAIN)
 
 TESTER_FLAGS =
 
@@ -33,6 +35,9 @@ default:
 	$(MAKE) -C .. 
 	$(MAKE) check
 
+# A non-standard classpath that works Linux, Mac, and Windows.
+CPATH = "..:$(CLASSPATH):;..;$(CLASSPATH)"
+
 # 'make check' will test run the tests in the testing directory.
 # For each .in file, it will "pipe" that file through your program
 # (that is, cause the .in file to be the standard input, rather as if it
@@ -43,7 +48,7 @@ default:
 # that contains your project.
 check: 
 	@echo "Testing application $(MAIN)..."
-	@CLASSPATH=..:$(CLASSPATH) python3 tester.py $(TESTER_FLAGS) $(TESTS)
+	@CLASSPATH=$(CPATH) $(PYTHON) tester.py $(TESTER_FLAGS) $(TESTS)
 
 # 'make clean' will clean up stuff you can reconstruct.
 clean:
