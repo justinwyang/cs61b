@@ -5,7 +5,6 @@
 
 import java.util.Iterator;
 
-
 /** List problem.
  *  @author Justin Yang
  */
@@ -18,25 +17,25 @@ class Lists {
      *  Destructive: creates no new IntList items, and may modify the
      *  original list pointed to by L. */
     static IntList2 naturalRuns(IntList L) {
-        IntList2 list2 = null, cur = null;
-        IntList start = L;
+        IntList2 list2 = new IntList2(L, null), cur = list2;
 
         while (L != null) {
-            if (L.tail != null && L.head > L.tail.head) {
-                IntList2 next = new IntList2(start, null);
+            if (L.tail != null && L.head >= L.tail.head) {
+                IntList2 next = new IntList2(L.tail, null);
                 if (list2 == null) {
                     cur = list2 = next;
                 } else {
                     cur.tail = next;
                     cur = cur.tail;
                 }
-                start = L.tail;
                 L.tail = null;
-                L = start;
+                L = cur.head;
             } else {
                 L = L.tail;
             }
         }
+        if (list2.head == null)
+            return null;
         return list2;
     }
 }

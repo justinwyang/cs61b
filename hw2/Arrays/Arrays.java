@@ -33,7 +33,17 @@ class Arrays {
      *  returns the three-element array
      *  {{1, 3, 7}, {5}, {4, 6, 9, 10}}. */
     static int[][] naturalRuns(int[] A) {
-        /* *Replace this body with the solution. */
-        return null;
+        int[][] runs = new int[A.length][];
+        int start = 0, cur = 0;
+        for (int i = 0; i < A.length; i++) {
+            if (i == A.length - 1 || A[i] >= A[i + 1]) {
+                runs[cur] = Utils.subarray(A, start, i + 1 - start);
+                cur++;
+                start = i + 1;
+            }
+        }
+        int[][] result = new int[cur][];
+        System.arraycopy(runs, 0, result, 0, cur);
+        return result;
     }
 }
