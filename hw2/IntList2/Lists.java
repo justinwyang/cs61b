@@ -3,7 +3,7 @@
 
 /** HW #2, Problem #1. */
 
-import java.util.Iterator;
+/*import java.util.Iterator;*/
 
 /** List problem.
  *  @author Justin Yang
@@ -34,8 +34,9 @@ class Lists {
                 L = L.tail;
             }
         }
-        if (list2.head == null)
+        if (list2.head == null) {
             return null;
+        }
         return list2;
     }
 }

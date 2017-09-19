@@ -47,13 +47,15 @@ public class ArraysTest {
         start = 4;
         len = 0;
         rem = new int[]{1, 2, 3, 4, 5};
-        assertArrayEquals("Trailing Length 0", rem, Arrays.remove(a, start, len));
+        assertArrayEquals("Trailing Length 0", rem,
+                Arrays.remove(a, start, len));
 
         a = new int[]{1, 2, 3, 4, 5};
         start = 0;
         len = 0;
         rem = new int[]{1, 2, 3, 4, 5};
-        assertArrayEquals("Heading Length 0", rem, Arrays.remove(a, start, len));
+        assertArrayEquals("Heading Length 0", rem,
+                Arrays.remove(a, start, len));
 
         a = new int[]{1, 2, 3, 4, 5};
         start = 0;

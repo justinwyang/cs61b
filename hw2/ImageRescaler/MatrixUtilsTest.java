@@ -1,8 +1,9 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/** FIXME
- *  @author FIXME
+/** Runs various tests for the MatrixUtils class
+ *
+ *  @author Justin Yang
  */
 
 public class MatrixUtilsTest {

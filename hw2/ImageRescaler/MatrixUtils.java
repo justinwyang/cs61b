@@ -1,7 +1,7 @@
 /** Provides a variety of utilities for operating on matrices.
  *  All methods assume that the double[][] arrays provided are rectangular.
  *
- *  @author Josh Hug and YOU
+ *  @author Josh Hug and Justin Yang
  */
 
 public class MatrixUtils {
@@ -53,7 +53,32 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulateVertical(double[][] m) {
-        return null; //your code here
+        double[][] am = new double[m.length][m[0].length];
+        for (int i = 0; i < m[0].length; i++) {
+            am[0][i] = m[0][i];
+        }
+        for (int i = 1; i < m.length; i++) {
+            for (int j = 0; j < m[i].length; j++) {
+                am[i][j] = m[i][j] + Math.min(get(m, i - 1, j),
+                        Math.min(get(m, i - 1, j - 1), get(m, i - 1, j + 1)));
+            }
+        }
+        return am;
+    }
+
+    /** Retrieves the value e[r][c] it it exists. If it doesn't exists,
+     *  returns Double.POSITIVE_INFINITY
+     *
+     *  @param e the matrix to retrieve a value from
+     *  @param r row
+     *  @param c column
+     */
+
+    public static double get(double[][] e, int r, int c) {
+        if (r >= 0 && r < e.length && c >= 0 && c < e[0].length) {
+            return e[r][c];
+        }
+        return Double.POSITIVE_INFINITY;
     }
 
     /** Non-destructively accumulates a matrix M along the specified
@@ -80,7 +105,25 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulate(double[][] m, Orientation orientation) {
-        return null; //your code here
+        if (orientation == Orientation.HORIZONTAL) {
+            return accumulateVertical(getTranspose(m));
+        }
+        return accumulateVertical(m);
+    }
+
+    /** Returns the transpose of a matrix m.
+     *
+     *  @param m the matrix to find the transpose of
+     */
+
+    public static double[][] getTranspose(double[][] m) {
+        double[][] mT = new double[m[0].length][m.length];
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 0; j < m[0].length; j++) {
+                mT[j][i] = m[i][j];
+            }
+        }
+        return mT;
     }
 
     /** Finds the vertical seam VERTSEAM of the given matrix M.
@@ -113,7 +156,37 @@ public class MatrixUtils {
      */
 
     public static int[] findVerticalSeam(double[][] m) {
-        return null; //your code here
+        double[][] e = accumulateVertical(m);
+        int[] seam = new int[m.length];
+        seam[m.length - 1] = findSmallestIdx(e);
+        for (int i = m.length - 1; i > 0; i--) {
+            int curIdx = seam[i];
+            double prevValue = e[i][curIdx] - m[i][curIdx];
+            for (int d = -1; d <= 1; d++) {
+                double toMatch = get(e, i - 1, curIdx + d);
+                if (Math.abs(toMatch - prevValue) < EPSILON) {
+                    seam[i - 1] = curIdx + d;
+                }
+            }
+        }
+        return seam;
+    }
+
+    /** Calculates the index of the minimum final energy value.
+     *
+     *  @param e the energy matrix
+     *  @return the index of the minimum final energy
+     */
+    public static int findSmallestIdx(double[][] e) {
+        double minEnergy = Double.POSITIVE_INFINITY;
+        int idx = -1;
+        for (int i = 0; i < e[e.length - 1].length; i++) {
+            if (e[e.length - 1][i] < minEnergy) {
+                minEnergy = e[e.length - 1][i];
+                idx = i;
+            }
+        }
+        return idx;
     }
 
     /** Returns the SEAM of M with the given ORIENTATION.
@@ -122,7 +195,10 @@ public class MatrixUtils {
      */
 
     public static int[] findSeam(double[][] m, Orientation orientation) {
-        return null; //your code here
+        if (orientation == Orientation.HORIZONTAL) {
+            return findVerticalSeam(getTranspose(m));
+        }
+        return findVerticalSeam(m);
     }
 
     /** does nothing. ARGS not used. use for whatever purposes you'd like */
@@ -274,5 +350,9 @@ public class MatrixUtils {
 
         return sb.toString();
     }
+
+    /** The value epsilon, to be used in double comparisons. */
+
+    private static final double EPSILON = 0.00001;
 
 }
