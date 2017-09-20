@@ -59,8 +59,9 @@ public class MatrixUtils {
         }
         for (int i = 1; i < m.length; i++) {
             for (int j = 0; j < m[i].length; j++) {
-                am[i][j] = m[i][j] + Math.min(get(m, i - 1, j),
-                        Math.min(get(m, i - 1, j - 1), get(m, i - 1, j + 1)));
+                am[i][j] =
+                        get(m, i, j) + Math.min(Math.min(get(am, i - 1, j - 1),
+                        get(am, i - 1, j)), get(am, i - 1, j + 1));
             }
         }
         return am;
@@ -106,7 +107,7 @@ public class MatrixUtils {
 
     public static double[][] accumulate(double[][] m, Orientation orientation) {
         if (orientation == Orientation.HORIZONTAL) {
-            return accumulateVertical(getTranspose(m));
+            return getTranspose(accumulateVertical(getTranspose(m)));
         }
         return accumulateVertical(m);
     }
@@ -162,9 +163,9 @@ public class MatrixUtils {
         for (int i = m.length - 1; i > 0; i--) {
             int curIdx = seam[i];
             double prevValue = e[i][curIdx] - m[i][curIdx];
-            for (int d = -1; d <= 1; d++) {
+            for (int d = 1; d >= -1; d--) {
                 double toMatch = get(e, i - 1, curIdx + d);
-                if (Math.abs(toMatch - prevValue) < EPSILON) {
+                if (Math.abs(toMatch - prevValue) < DELTA) {
                     seam[i - 1] = curIdx + d;
                 }
             }
@@ -353,6 +354,6 @@ public class MatrixUtils {
 
     /** The value epsilon, to be used in double comparisons. */
 
-    private static final double EPSILON = 0.00001;
+    private static final double DELTA = 0.00001;
 
 }
