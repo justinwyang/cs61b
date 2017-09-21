@@ -34,7 +34,10 @@ public class EveryOtherWord {
         return set;
     }
 
-    /** Tests whether or not your everyOtherWord method works correctly. */
+    /** Tests whether or not your everyOtherWord method works correctly.
+     *
+     * @param args unused
+     */
     public static void main(String[] args) {
         List<String> L = new ArrayList<String>();
         L.add("hey"); L.add("this"); L.add("fish"); L.add("eats");

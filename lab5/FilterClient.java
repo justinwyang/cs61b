@@ -33,9 +33,26 @@ public class FilterClient {
         for (Integer[] data: TESTS) {
             List<Integer> L = Arrays.asList(data);
             System.out.println(L);
+            System.out.println();
+
             Filter<Integer> f1 = new TrivialFilter<Integer>(L.iterator());
+            System.out.println("Trivial Filter:");
             printAll(f1);
-            // ADDTOME?
+
+            Filter<Integer> f2 = new AlternatingFilter<>(L.iterator());
+            System.out.println("Alternating Filter:");
+            printAll(f2);
+
+            Filter<Integer> f3 = everyFourth(L.iterator());
+            System.out.println("Every Fourth:");
+            printAll(f3);
+
+            Filter<Integer> f4 = evenNumberFilter(L.iterator());
+            System.out.println("Even Number Filter:");
+            printAll(f4);
+
+            System.out.println();
+
         }
     }
 
@@ -51,20 +68,20 @@ public class FilterClient {
      *  starting with the first.  You should not need to define a new
      *  class. */
     static Filter<Integer> everyFourth(Iterator<Integer> input) {
-        return null;  // FIXME
+        return new AlternatingFilter<>(new AlternatingFilter<>(input));
     }
 
     /** Returns a filter that delivers every even valued integer of
      *  INPUT. You should not need to define a new class. */
     static Filter<Integer> evenNumberFilter(Iterator<Integer> input) {
-        return null; // FIXME
+        return new PredicateFilter<>(new Even(), input);
     }
 
     /** A class whose instances represent the test for eveness. */
     static class Even implements Predicate<Integer> {
         @Override
         public boolean test(Integer x) {
-            return false; // FIXME
+            return x.intValue() % 2 == 0;
         }
     }
 }

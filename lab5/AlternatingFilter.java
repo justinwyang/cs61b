@@ -10,15 +10,18 @@ class AlternatingFilter<Value> extends Filter<Value> {
     /** A filter of values from INPUT that lets through every other
      *  value. */
     AlternatingFilter(Iterator<Value> input) {
-        super(input); //FIXME?
-        // FIXME
+        super(input);
+        _valid = false;
     }
 
     @Override
     protected boolean keep() {
-        return false;  // FIXME
+        _valid = !_valid;
+        return _valid;
     }
 
-    // FIXME
+    /** Stores whether the previous value was valid.
+     */
+    private boolean _valid;
 
 }

@@ -7,6 +7,11 @@ import java.util.TreeSet;
  */
 
 public class SetDemo {
+
+    /** Demos features of a Set.
+     *
+     * @param args unused
+     */
     public static void main(String[] args) {
         Set<String> set = new TreeSet<String>();
 
