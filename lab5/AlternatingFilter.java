@@ -3,7 +3,7 @@ import utils.Filter;
 
 /** A kind of Filter that lets through every other VALUE element of
  *  its input sequence, starting with the first.
- *  @author You
+ *  @author Justin Yang
  */
 class AlternatingFilter<Value> extends Filter<Value> {
 

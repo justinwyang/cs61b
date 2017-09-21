@@ -3,7 +3,7 @@ import utils.Filter;
 
 /** A kind of Filter that lets all the VALUE elements of its input sequence
  *  through.
- *  @author You
+ *  @author Justin Yang
  */
 class TrivialFilter<Value> extends Filter<Value> {
 

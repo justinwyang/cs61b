@@ -4,7 +4,7 @@ import utils.Filter;
 
 /** A kind of Filter that tests the elements of its input sequence of
  *  VALUES by applying a Predicate object to them.
- *  @author You
+ *  @author Justin Yang
  */
 class PredicateFilter<Value> extends Filter<Value> {
 

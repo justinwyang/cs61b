@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 /** Exercises for Lab 6.
- *  @author You.
+ *  @author Justin Yang
  */
 public class FilterClient {
 

@@ -5,7 +5,7 @@ import utils.Filter;
  *  that are larger than all the preceding values to go through the
  *  Filter.  So, if its input delivers (1, 2, 3, 3, 2, 1, 5), then it
  *  will produce (1, 2, 3, 5).
- *  @author You
+ *  @author Justin Yang
  */
 class MonotonicFilter<Value extends Comparable<Value>> extends Filter<Value> {
 
