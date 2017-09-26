@@ -39,9 +39,8 @@ class Table {
             }
         }
 
-        // FIXME
-        _titles = null;
-        _columns = null;
+        _titles = columnTitles;
+        _columns = new ValueList[_rowSize];
     }
 
     /** A new Table whose columns are give by COLUMNTITLES. */
@@ -51,18 +50,23 @@ class Table {
 
     /** Return the number of columns in this table. */
     public int columns() {
-        return 0;  // REPLACE WITH SOLUTION
+        return _titles.length;
     }
 
     /** Return the title of the Kth column.  Requires 0 <= K < columns(). */
     public String getTitle(int k) {
-        return null;  // REPLACE WITH SOLUTION
+        return _titles[k];
     }
 
     /** Return the number of the column whose title is TITLE, or -1 if
      *  there isn't one. */
     public int findColumn(String title) {
-        return -1;  // REPLACE WITH SOLUTION
+        for (int i = 0; i < _titles.length; i++) {
+            if (_titles[i].equals(title)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Return the number of rows in this table. */
@@ -74,7 +78,7 @@ class Table {
      *  of record number ROW (0 <= ROW < size()). */
     public String get(int row, int col) {
         try {
-            return null; // REPLACE WITH SOLUTION
+            return _columns[col].get(row);
         } catch (IndexOutOfBoundsException excp) {
             throw error("invalid row or column");
         }
@@ -84,7 +88,22 @@ class Table {
      *  row already exists.  Return true if anything was added,
      *  false otherwise. */
     public boolean add(String[] values) {
-        return false;   // REPLACE WITH SOLUTION
+        for (ValueList arr : _columns) {
+            boolean match = true;
+            for (int i = 0; i < _size; i++) {
+                if (!values[i].equals(arr.get(i))) {
+                    match = false;
+                }
+            }
+            if (match) {
+                return false;
+            }
+        }
+        for (int i = 0; i < _rowSize; i++) {
+            _columns[i].add(values[i]);
+        }
+        _size++;
+        return true;
     }
 
     /** Add a new row whose column values are extracted by COLUMNS from
@@ -93,7 +112,10 @@ class Table {
      *  Column.getFrom(Integer...) for a description of how Columns
      *  extract values. */
     public boolean add(List<Column> columns, Integer... rows) {
-        return false;   // REPLACE WITH SOLUTION
+        String[] values = new String[_rowSize];
+        for (int i = ) {
+            add(co)
+        }
     }
 
     /** Read the contents of the file NAME.db, and return as a Table.
@@ -110,7 +132,7 @@ class Table {
                 throw error("missing header in DB file");
             }
             String[] columnNames = header.split(",");
-            // FILL IN
+
         } catch (FileNotFoundException e) {
             throw error("could not find %s.db", name);
         } catch (IOException e) {
@@ -149,7 +171,19 @@ class Table {
     /** Print my contents on the standard output, separated by spaces
      *  and indented by two spaces. */
     void print() {
-        // FILL IN
+        System.out.print(" ");
+        for (String s : _titles) {
+            System.out.print(" " + s);
+        }
+        System.out.println();
+
+        for (int i = 0; i < _rowSize; i++) {
+            String curLine = " ";
+            for (int j = 0; j < _size; j++) {
+                curLine += " " + _columns[i].get(j);
+            }
+            System.out.println(curLine);
+        }
     }
 
     /** Return a new Table whose columns are COLUMNNAMES, selected from

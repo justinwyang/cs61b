@@ -10,7 +10,7 @@ package db61b;
 import java.util.List;
 
 /** Represents a single 'where' condition in a 'select' command.
- *  @author */
+ *  @author Justin Yang*/
 class Condition {
 
     /** A Condition representing COL1 RELATION COL2, where COL1 and COL2
