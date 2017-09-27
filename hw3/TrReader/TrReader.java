@@ -17,7 +17,8 @@ public class TrReader extends Reader {
         _to = to;
     }
 
-    public int read(char cbuf[], int off, int len) throws IOException {
+    @Override
+    public int read(char[] cbuf, int off, int len) throws IOException {
         int ret = _reader.read(cbuf, off, len);
         for (int i = 0; i < cbuf.length; i++) {
             cbuf[i] = convert(cbuf[i]);
@@ -25,6 +26,9 @@ public class TrReader extends Reader {
         return ret;
     }
 
+    /** Returns a converted char, otherwise returns without changes.
+     * @param c the char to convert
+     */
     public char convert(char c) {
         for (int i = 0; i < _from.length(); i++) {
             if (_from.charAt(i) == c) {
@@ -34,12 +38,18 @@ public class TrReader extends Reader {
         return c;
     }
 
+    @Override
     public void close() throws IOException {
         _reader.close();
     }
 
+    /** The Reader to read in a buffer from. */
     private Reader _reader;
+
+    /** The "from" String for conversion. */
     private String _from;
+
+    /** The "to" String for conversion. */
     private String _to;
 }
 

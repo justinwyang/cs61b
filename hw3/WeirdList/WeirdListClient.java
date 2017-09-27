@@ -5,12 +5,51 @@ class WeirdListClient {
 
     /** Return the result of adding N to each element of L. */
     static WeirdList add(WeirdList L, int n) {
-        return null; // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return L.map(new Adder(n));
     }
 
     /** Return the sum of the elements in L. */
     static int sum(WeirdList L) {
-        return 0; // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        CumulativeAdder accumulate = new CumulativeAdder();
+        L.map(accumulate);
+        return accumulate.getValue();
+    }
+
+    /** Class intended to add values. */
+    private static class Adder implements IntUnaryFunction {
+        /** Constructor for the Adder class.
+         *  @param n the value to add
+         */
+        public Adder(int n) {
+            _n = n;
+        }
+
+        /** Returns the adder value. */
+        public int getValue() {
+            return _n;
+        }
+
+        @Override
+        public int apply(int x) {
+            return _n + x;
+        }
+
+        /** The current adder value. */
+        protected int _n;
+    }
+
+    /** Subclass of Adder meant to accumulate values passed in. */
+    private static class CumulativeAdder extends Adder {
+        /** Constructor for CumulativeAdder. */
+        public CumulativeAdder() {
+            super(0);
+        }
+
+        @Override
+        public int apply(int x) {
+            _n = super.apply(x);
+            return _n;
+        }
     }
 
     /* As with WeirdList, you'll need to add an additional class or

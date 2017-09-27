@@ -2,5 +2,6 @@
 *.py
 *.jar
 *~
+*.idea
+out/
 .DS_Store
-

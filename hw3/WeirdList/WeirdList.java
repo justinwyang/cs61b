@@ -3,16 +3,18 @@
  */
 public class WeirdList {
     /** The empty sequence of integers. */
-    public static final WeirdList EMPTY =
-        null;  // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+    public static final WeirdList EMPTY = new EmptyList();
 
     /** A new WeirdList whose head is HEAD and tail is TAIL. */
-    public WeirdList(int head, WeirdList tail) { /* FILL IN */ }
+    public WeirdList(int head, WeirdList tail) {
+        _head = head;
+        _tail = tail;
+    }
 
     /** Returns the number of elements in the sequence that
      *  starts with THIS. */
     public int length() {
-        return 0;  // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return _tail.length() + 1;
     }
 
     /** Return a string containing my contents as a sequence of numerals
@@ -20,14 +22,51 @@ public class WeirdList {
      *  5, 4, and 2, this returns " 5 4 2". */
     @Override
     public String toString() {
-        return ""; // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return " " + _head + _tail.toString();
     }
 
     /** Part 3b: Apply FUNC.apply to every element of THIS WeirdList in
      *  sequence, and return a WeirdList of the resulting values. */
     public WeirdList map(IntUnaryFunction func) {
-        return null;  // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return new WeirdList(func.apply(_head), _tail.map(func));
     }
+
+    /** Print the contents of THIS WeirdList on the standard output
+     *  (on one line, each followed by a blank).  Does not print
+     *  an end-of-line. */
+    public void print() {
+        System.out.print(_head + " ");
+        _tail.print();
+    }
+
+    /** Subclass of WeirdList to represent an empty list element. */
+    private static class EmptyList extends WeirdList {
+        /** Constructor for EmptyList. */
+        public EmptyList() {
+            super(-1, null);
+        }
+
+        @Override
+        public int length() {
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return "";
+        }
+
+        @Override
+        public WeirdList map(IntUnaryFunction func) {
+            return this;
+        }
+    }
+
+    /** The value stored in current node. */
+    private int _head;
+
+    /** Points to the next node in the list. */
+    private WeirdList _tail;
 
     /*
      * You should not add any methods to WeirdList, but you will need
