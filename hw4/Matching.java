@@ -17,7 +17,8 @@ public class Matching {
      *  string "QUIT/<newline>" */
     public static void main(String[] ignored) {
         Scanner inp = new Scanner(System.in);
-        System.out.println("  Alternately type strings to match and patterns to");
+        System.out.println("  Alternately type strings to match "
+                + "and patterns to");
         System.out.println("  match against them.  Use \\ at the end of line");
         System.out.println("  to enter multi-line strings or patterns (\\s");
         System.out.println("  are removed, leaving newlines).");
