@@ -30,7 +30,8 @@ class Table {
         _size = 0;
         _rowSize = columnTitles.length;
 
-        for (int i = columnTitles.length - 1; i >= 1; i -= 1) {
+        //FILL THIS IN
+        for (int i = _rowSize - 1; i >= 1; i -= 1) {
             for (int j = i - 1; j >= 0; j -= 1) {
                 if (columnTitles[i].equals(columnTitles[j])) {
                     throw error("duplicate column name: %s",
@@ -50,7 +51,7 @@ class Table {
 
     /** Return the number of columns in this table. */
     public int columns() {
-        return _titles.length;
+        return _rowSize;
     }
 
     /** Return the title of the Kth column.  Requires 0 <= K < columns(). */
@@ -61,7 +62,8 @@ class Table {
     /** Return the number of the column whose title is TITLE, or -1 if
      *  there isn't one. */
     public int findColumn(String title) {
-        for (int i = 0; i < _titles.length; i++) {
+        //FILL THIS IN (Done)
+        for (int i = 0; i < _rowSize; i++) {
             if (_titles[i].equals(title)) {
                 return i;
             }
@@ -71,13 +73,15 @@ class Table {
 
     /** Return the number of rows in this table. */
     public int size() {
-        return 0;  // REPLACE WITH SOLUTION
+        //FILL THIS IN (Done)
+        return _size;
     }
 
     /** Return the value of column number COL (0 <= COL < columns())
      *  of record number ROW (0 <= ROW < size()). */
     public String get(int row, int col) {
         try {
+            //FILL THIS IN (Done)
             return _columns[col].get(row);
         } catch (IndexOutOfBoundsException excp) {
             throw error("invalid row or column");
@@ -88,22 +92,32 @@ class Table {
      *  row already exists.  Return true if anything was added,
      *  false otherwise. */
     public boolean add(String[] values) {
-        for (ValueList arr : _columns) {
-            boolean match = true;
-            for (int i = 0; i < _size; i++) {
-                if (!values[i].equals(arr.get(i))) {
-                    match = false;
-                }
-            }
-            if (match) {
-                return false;
-            }
-        }
+        //FILL THIS IN (hopefully done?)
         for (int i = 0; i < _rowSize; i++) {
             _columns[i].add(values[i]);
         }
         _size++;
+
+        int idx = _size - 1;
+        for (int i = 0; i < _size - 1; i++) {
+            int cmp = compareRows(i, _size - 1)
+            if (cmp == 0) {
+                removeFinalRow();
+                return false;
+            } else if (cmp > 0) {
+                idx = i;
+                break;
+            }
+        }
+        _index.add(idx, _size - 1);
         return true;
+    }
+
+    private void removeFinalRow() {
+        for (int i = 0; i < _size; i++) {
+            _columns[i].remove(_size - 1);
+        }
+        _size--;
     }
 
     /** Add a new row whose column values are extracted by COLUMNS from
@@ -112,10 +126,12 @@ class Table {
      *  Column.getFrom(Integer...) for a description of how Columns
      *  extract values. */
     public boolean add(List<Column> columns, Integer... rows) {
+        //FILL THIS IN (maybe done? but I don't get it)
         String[] values = new String[_rowSize];
-        for (int i = ) {
-            add(co)
+        for (int i = 0; i < _rowSize; i++) {
+            values[i] = columns.get(i).getFrom(rows);
         }
+        return add(values);
     }
 
     /** Read the contents of the file NAME.db, and return as a Table.
@@ -131,7 +147,7 @@ class Table {
             if (header == null) {
                 throw error("missing header in DB file");
             }
-            String[] columnNames = header.split(",");
+            //FILL THIS IN
 
         } catch (FileNotFoundException e) {
             throw error("could not find %s.db", name);
@@ -155,10 +171,11 @@ class Table {
         PrintStream output;
         output = null;
         try {
-            String sep;
-            sep = "";
+            String sep = "";
             output = new PrintStream(name + ".db");
-            // FILL THIS IN
+            // FILL THIS IN (Done?)
+            sep += format("", ",");
+            output.print(sep);
         } catch (IOException e) {
             throw error("trouble writing to %s.db", name);
         } finally {
@@ -171,19 +188,31 @@ class Table {
     /** Print my contents on the standard output, separated by spaces
      *  and indented by two spaces. */
     void print() {
-        System.out.print(" ");
-        for (String s : _titles) {
-            System.out.print(" " + s);
-        }
-        System.out.println();
+        //FILL THIS IN (Done?)
+        System.out.print(format("  ", " "));
+    }
 
+    String format(String header, String separator) {
+        String s = header;
         for (int i = 0; i < _rowSize; i++) {
-            String curLine = " ";
-            for (int j = 0; j < _size; j++) {
-                curLine += " " + _columns[i].get(j);
+            s += _titles[i];
+            if (i == _size - 1) {
+                s += separator;
             }
-            System.out.println(curLine);
         }
+        s += "\n";
+
+        for (int i = 0; i < _size; i++) {
+            s += header
+            for (int j = 0; j < _rowSize; j++) {
+                s += _columns[j].get(_index.get(i));
+                if (j == _rowSize - 1) {
+                    s += separator;
+                }
+            }
+            s += "\n";
+        }
+        return s;
     }
 
     /** Return a new Table whose columns are COLUMNNAMES, selected from
@@ -210,7 +239,7 @@ class Table {
      *  _columns[0].get(K1), _columns[1].get(K1), ....  This method ignores
      *  the _index. */
     private int compareRows(int k0, int k1) {
-        for (int i = 0; i < _columns.length; i += 1) {
+        for (int i = 0; i < _rowSize; i += 1) {
             int c = _columns[i].get(k0).compareTo(_columns[i].get(k1));
             if (c != 0) {
                 return c;
