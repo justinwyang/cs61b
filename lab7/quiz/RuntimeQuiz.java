@@ -61,7 +61,7 @@ public class RuntimeQuiz {
     }
 
     public static Asymptotic f5_notation = Asymptotic.BIG_THETA;
-    public static Runtime f5_runtime = Runtime.LINEARITHMIC;
+    public static Runtime f5_runtime = Runtime.LOG_N;
     public void f5(int n) {
         int[] array = {1, 2, 3};
         while (n > 0) {
@@ -70,7 +70,7 @@ public class RuntimeQuiz {
         }
     }
 
-    public static Asymptotic f6_notation = Asymptotic.BIG_THETA;
+    public static Asymptotic f6_notation = Asymptotic.BIG_O;
     public static Runtime f6_runtime = Runtime.LINEAR;
     public void f6(int[] array) {
         for (int i = 1; i < array.length; i++) {
