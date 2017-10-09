@@ -166,7 +166,8 @@ class CommandInterpreter {
         _input.next("table");
         String name = name();
         Table table = tableDefinition();
-        // FILL IN CODE TO EXECUTE THE STATEMENT
+        // FILL IN CODE TO EXECUTE THE STATEMENT (Done?)
+        _database.put(name, table);
         _input.next(";");
     }
 
@@ -192,7 +193,10 @@ class CommandInterpreter {
         while (true) {
             int k;
             _input.next("(");
-            // FILL THIS IN
+            // FILL THIS IN (Done?)
+            for (k = 0; k < values.length; k++) {
+                values[k] = _input.next();
+            }
             _input.next(")");
             table.add(values);
             if (!_input.nextIf(",")) {
@@ -204,7 +208,11 @@ class CommandInterpreter {
 
     /** Parse and execute a load statement from the token stream. */
     void loadStatement() {
-        // FILL THIS IN
+        // FILL THIS IN (Done?)
+        _input.next("load");
+        String name = _input.next();
+        Table.readTable(name);
+        _input.next(";");
     }
 
     /** Parse and execute a store statement from the token stream. */
@@ -212,7 +220,8 @@ class CommandInterpreter {
         _input.next("store");
         String name = _input.peek();
         Table table = tableName();
-        // FILL THIS IN
+        // FILL THIS IN (Done?)
+        table.writeTable(name);
         System.out.printf("Stored %s.db%n", name);
         _input.next(";");
     }
@@ -220,6 +229,11 @@ class CommandInterpreter {
     /** Parse and execute a print statement from the token stream. */
     void printStatement() {
         // FILL THIS IN
+        _input.next("print");
+        String name = _input.next();
+        Table table = _database.get(name);
+        table.print();
+        _input.next(";");
     }
 
     /** Parse and execute a select statement from the token stream. */
@@ -235,11 +249,16 @@ class CommandInterpreter {
     Table tableDefinition() {
         Table table;
         if (_input.nextIf("(")) {
-            // REPLACE WITH SOLUTION
-            table = null;
+            // REPLACE WITH SOLUTION (Done?)
+            ArrayList<String> titles = new ArrayList<>();
+            for(String token = _input.next(); !token.equals(")"); token = _input.next()) {
+                titles.add(token);
+            }
+            table = new Table(titles);
         } else {
-            // REPLACE WITH SOLUTION
-            table = null;
+            // REPLACE WITH SOLUTION (Done)
+            _input.next("as");
+            table = selectClause();
         }
         return table;
     }

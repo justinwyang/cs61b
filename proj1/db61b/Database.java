@@ -9,18 +9,27 @@ package db61b;
 
 // FILL IN (WITH IMPORTS)?
 
+import java.util.ArrayList;
+
 /** A collection of Tables, indexed by name.
  *  @author Justin Yang */
 class Database {
     /** An empty database. */
     public Database() {
-        // FILL IN
+        _tables = new ArrayList<>();
+        _names = new ArrayList<>();
+        _length = 0;
     }
 
     /** Return the Table whose name is NAME stored in this database, or null
      *  if there is no such table. */
     public Table get(String name) {
-        return null;             // REPLACE WITH SOLUTION
+        for (int i = 0; i < _length; i++) {
+            if (_names.get(i).equals(name)) {
+                return _tables.get(i);
+            }
+        }
+        return null;
     }
 
     /** Set or replace the table named NAME in THIS to TABLE.  TABLE and
@@ -29,8 +38,18 @@ class Database {
         if (name == null || table == null) {
             throw new IllegalArgumentException("null argument");
         }
-        // FILL IN
+        for (int i = 0; i < _length; i++) {
+            if (_names.get(i).equals(name)) {
+                _tables.set(i, table);
+                return;
+            }
+        }
+        _names.add(name);
+        _tables.add(table);
+        _length++;
     }
 
-    // FILL IN?
+    private ArrayList<Table> _tables;
+    private ArrayList<String> _names;
+    private int _length;
 }

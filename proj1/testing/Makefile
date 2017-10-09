@@ -1,4 +1,4 @@
-# This makefile is defined to give you the following targets:
+q# This makefile is defined to give you the following targets:
 #
 #    default: Same as check
 #    check: For each file, F.in, use F.in as input to "java $(MAIN_CLASS)" and

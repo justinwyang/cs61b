@@ -30,7 +30,7 @@ class Table {
         _size = 0;
         _rowSize = columnTitles.length;
 
-        //FILL THIS IN
+        //FILL THIS IN (Done?)
         for (int i = _rowSize - 1; i >= 1; i -= 1) {
             for (int j = i - 1; j >= 0; j -= 1) {
                 if (columnTitles[i].equals(columnTitles[j])) {
@@ -100,7 +100,7 @@ class Table {
 
         int idx = _size - 1;
         for (int i = 0; i < _size - 1; i++) {
-            int cmp = compareRows(i, _size - 1)
+            int cmp = compareRows(i, _size - 1);
             if (cmp == 0) {
                 removeFinalRow();
                 return false;
@@ -126,7 +126,7 @@ class Table {
      *  Column.getFrom(Integer...) for a description of how Columns
      *  extract values. */
     public boolean add(List<Column> columns, Integer... rows) {
-        //FILL THIS IN (maybe done? but I don't get it)
+        //FILL THIS IN
         String[] values = new String[_rowSize];
         for (int i = 0; i < _rowSize; i++) {
             values[i] = columns.get(i).getFrom(rows);
@@ -147,8 +147,11 @@ class Table {
             if (header == null) {
                 throw error("missing header in DB file");
             }
-            //FILL THIS IN
-
+            //FILL THIS IN (Done?)
+            table = new Table(header.split(","));
+            for (header = input.readLine(); header != null; header = input.readLine()) {
+                table.add(header.split(","));
+            }
         } catch (FileNotFoundException e) {
             throw error("could not find %s.db", name);
         } catch (IOException e) {
@@ -203,7 +206,7 @@ class Table {
         s += "\n";
 
         for (int i = 0; i < _size; i++) {
-            s += header
+            s += header;
             for (int j = 0; j < _rowSize; j++) {
                 s += _columns[j].get(_index.get(i));
                 if (j == _rowSize - 1) {
@@ -220,6 +223,7 @@ class Table {
     Table select(List<String> columnNames, List<Condition> conditions) {
         Table result = new Table(columnNames);
         // FILL IN
+        
         return result;
     }
 

@@ -49,7 +49,7 @@ class Tokenizer {
 
     /** Read the next potential token and add it to _buffer.  Filters
      *  out comments and ends-of-line. Adds "*EOF*" at the end of input.
-     *  Throws DBException on encountering a lexical error (such as an
+     *  Throws an error on encountering a lexical error (such as an
      *  unterminated literal). */
     private void readToken() {
         while (true) {

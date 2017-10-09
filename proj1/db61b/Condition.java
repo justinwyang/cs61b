@@ -17,7 +17,10 @@ class Condition {
      *  are column designators. and RELATION is one of the
      *  strings "<", ">", "<=", ">=", "=", or "!=". */
     Condition(Column col1, String relation, Column col2) {
-        // YOUR CODE HERE
+        // YOUR CODE HERE (Done?)
+        this._col1 = col1;
+        this._col2 = col2;
+        this._relation = relation;
     }
 
     /** A Condition representing COL1 RELATION 'VAL2', where COL1 is
@@ -34,7 +37,33 @@ class Condition {
      *  from which my columns are selected, returns the result of
      *  performing the test I denote. */
     boolean test(Integer... rows) {
-        // REPLACE WITH SOLUTION
+        // REPLACE WITH SOLUTION (Done?)
+        String val1 = _col1.getFrom(rows)
+        String val2;
+        if (_val2 == null) {
+            val2 = _col2.getFrom(rows);
+        } else {
+            val2 = _val2;
+        }
+
+        int cmp = val2.compareTo(val2);
+
+        switch(_relation) {
+            case "<":
+                return cmp < 0;
+            case ">":
+                return cmp > 0;
+            case "<=":
+                return cmp <= 0;
+            case ">=":
+                return cmp >= 0;
+            case "=":
+                return cmp == 0;
+            case "!=":
+                return cmp != 0;
+            default:
+                return false;
+        }
         return false;
     }
 
@@ -54,4 +83,5 @@ class Condition {
     /** Second operand, if literal (otherwise null). */
     private String _val2;
     // ADD ADDITIONAL FIELDS HERE
+    private String _relation;
 }
