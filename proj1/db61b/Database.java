@@ -1,13 +1,4 @@
-// This is a SUGGESTED skeleton for a class that contains the Tables your
-// program manipulates.  You can throw this away if you want, but it is a good
-// idea to try to understand it first.  Our solution changes about 6
-// lines in this skeleton.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package db61b;
-
-// FILL IN (WITH IMPORTS)?
 
 import java.util.ArrayList;
 
@@ -49,7 +40,10 @@ class Database {
         _length++;
     }
 
+    /** Stores the list of tables. */
     private ArrayList<Table> _tables;
+    /** Stores the names of the tables. */
     private ArrayList<String> _names;
+    /** Stores the length of the table and name arrays. */
     private int _length;
 }

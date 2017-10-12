@@ -1,10 +1,3 @@
-// This is a SUGGESTED skeleton for a class that represents a single
-// Table.  You can throw this away if you want, but it is a good
-// idea to try to understand it first.  Our solution changes or adds
-// about 100 lines in this skeleton.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package db61b;
 
 import java.io.BufferedReader;
@@ -30,7 +23,6 @@ class Table {
         _size = 0;
         _rowSize = columnTitles.length;
 
-        //FILL THIS IN (Done?)
         for (int i = _rowSize - 1; i >= 1; i -= 1) {
             for (int j = i - 1; j >= 0; j -= 1) {
                 if (columnTitles[i].equals(columnTitles[j])) {
@@ -42,6 +34,9 @@ class Table {
 
         _titles = columnTitles;
         _columns = new ValueList[_rowSize];
+        for (int i = 0; i < _rowSize; i++) {
+            _columns[i] = new ValueList();
+        }
     }
 
     /** A new Table whose columns are give by COLUMNTITLES. */
@@ -62,7 +57,6 @@ class Table {
     /** Return the number of the column whose title is TITLE, or -1 if
      *  there isn't one. */
     public int findColumn(String title) {
-        //FILL THIS IN (Done)
         for (int i = 0; i < _rowSize; i++) {
             if (_titles[i].equals(title)) {
                 return i;
@@ -73,7 +67,6 @@ class Table {
 
     /** Return the number of rows in this table. */
     public int size() {
-        //FILL THIS IN (Done)
         return _size;
     }
 
@@ -81,7 +74,6 @@ class Table {
      *  of record number ROW (0 <= ROW < size()). */
     public String get(int row, int col) {
         try {
-            //FILL THIS IN (Done)
             return _columns[col].get(row);
         } catch (IndexOutOfBoundsException excp) {
             throw error("invalid row or column");
@@ -92,15 +84,14 @@ class Table {
      *  row already exists.  Return true if anything was added,
      *  false otherwise. */
     public boolean add(String[] values) {
-        //FILL THIS IN (hopefully done?)
         for (int i = 0; i < _rowSize; i++) {
             _columns[i].add(values[i]);
         }
         _size++;
 
-        int idx = _size - 1;
-        for (int i = 0; i < _size - 1; i++) {
-            int cmp = compareRows(i, _size - 1);
+        int idx = size() - 1;
+        for (int i = 0; i < size() - 1; i++) {
+            int cmp = compareRows(i, size() - 1);
             if (cmp == 0) {
                 removeFinalRow();
                 return false;
@@ -109,13 +100,15 @@ class Table {
                 break;
             }
         }
-        _index.add(idx, _size - 1);
+        _index.add(idx, size() - 1);
         return true;
     }
 
+    /** Removes the final row in the _columns array, to be used as a helper
+     *  function for add. */
     private void removeFinalRow() {
-        for (int i = 0; i < _size; i++) {
-            _columns[i].remove(_size - 1);
+        for (int i = 0; i < _rowSize; i++) {
+            _columns[i].remove(size() - 1);
         }
         _size--;
     }
@@ -126,7 +119,6 @@ class Table {
      *  Column.getFrom(Integer...) for a description of how Columns
      *  extract values. */
     public boolean add(List<Column> columns, Integer... rows) {
-        //FILL THIS IN
         String[] values = new String[_rowSize];
         for (int i = 0; i < _rowSize; i++) {
             values[i] = columns.get(i).getFrom(rows);
@@ -147,9 +139,9 @@ class Table {
             if (header == null) {
                 throw error("missing header in DB file");
             }
-            //FILL THIS IN (Done?)
             table = new Table(header.split(","));
-            for (header = input.readLine(); header != null; header = input.readLine()) {
+            for (header = input.readLine(); header != null;
+                 header = input.readLine()) {
                 table.add(header.split(","));
             }
         } catch (FileNotFoundException e) {
@@ -176,7 +168,13 @@ class Table {
         try {
             String sep = "";
             output = new PrintStream(name + ".db");
-            // FILL THIS IN (Done?)
+            for (int i = 0; i < _rowSize; i++) {
+                sep += _titles[i];
+                if (i != _rowSize - 1) {
+                    sep += ",";
+                }
+            }
+            sep += "\n";
             sep += format("", ",");
             output.print(sep);
         } catch (IOException e) {
@@ -191,25 +189,24 @@ class Table {
     /** Print my contents on the standard output, separated by spaces
      *  and indented by two spaces. */
     void print() {
-        //FILL THIS IN (Done?)
         System.out.print(format("  ", " "));
     }
 
+    /** Formats the body of the table into a readable String based on
+     *  given header and separator parameters, to be used as a helper
+     *  function for print and writeTable.
+     *
+     *  @return the formatted output
+     *  @param header the header in front of each line
+     *  @param separator the separator between values on each line
+     */
     String format(String header, String separator) {
-        String s = header;
-        for (int i = 0; i < _rowSize; i++) {
-            s += _titles[i];
-            if (i == _size - 1) {
-                s += separator;
-            }
-        }
-        s += "\n";
-
-        for (int i = 0; i < _size; i++) {
+        String s = "";
+        for (int i = 0; i < size(); i++) {
             s += header;
             for (int j = 0; j < _rowSize; j++) {
                 s += _columns[j].get(_index.get(i));
-                if (j == _rowSize - 1) {
+                if (j != _rowSize - 1) {
                     s += separator;
                 }
             }
@@ -222,8 +219,15 @@ class Table {
      *  rows of this table that satisfy CONDITIONS. */
     Table select(List<String> columnNames, List<Condition> conditions) {
         Table result = new Table(columnNames);
-        // FILL IN
-        
+        ArrayList<Column> columns = new ArrayList<>();
+        for (int c = 0; c < columnNames.size(); c++) {
+            columns.add(new Column(columnNames.get(c), this));
+        }
+        for (int r = 0; r < size(); r++) {
+            if (Condition.test(conditions, r)) {
+                result.add(columns, r);
+            }
+        }
         return result;
     }
 
@@ -233,7 +237,28 @@ class Table {
     Table select(Table table2, List<String> columnNames,
                  List<Condition> conditions) {
         Table result = new Table(columnNames);
-        // FILL IN
+        ArrayList<Column> common1 = new ArrayList<>(),
+                common2 = new ArrayList<>();
+        for (String title : _titles) {
+            if (table2.findColumn(title) != -1) {
+                common1.add(new Column(title, this));
+                common2.add(new Column(title, table2));
+            }
+        }
+
+        ArrayList<Column> unified = new ArrayList<>();
+        for (String columnName : columnNames) {
+            unified.add(new Column(columnName, this, table2));
+        }
+
+        for (int r1 = 0; r1 < this.size(); r1++) {
+            for (int r2 = 0; r2 < table2.size(); r2++) {
+                if (equijoin(common1, common2, r1, r2)
+                        && Condition.test(conditions, r1, r2)) {
+                    result.add(unified, r1, r2);
+                }
+            }
+        }
         return result;
     }
 
@@ -260,7 +285,13 @@ class Table {
      *  into those tables. */
     private static boolean equijoin(List<Column> common1, List<Column> common2,
                                     int row1, int row2) {
-        return true; // REPLACE WITH SOLUTION
+        for (int i = 0; i < common1.size(); i++) {
+            if (!common1.get(i).getFrom(row1).equals
+                    (common2.get(i).getFrom(row2))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** A class that is essentially ArrayList<String>.  For technical reasons,

@@ -1,10 +1,3 @@
-// This is a SUGGESTED skeleton for a class that describes a single
-// Condition (such as CCN = '99776').  You can throw this away if you
-// want,  but it is a good idea to try to understand it first.
-// Our solution changes or adds about 30 lines in this skeleton.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package db61b;
 
 import java.util.List;
@@ -17,7 +10,6 @@ class Condition {
      *  are column designators. and RELATION is one of the
      *  strings "<", ">", "<=", ">=", "=", or "!=". */
     Condition(Column col1, String relation, Column col2) {
-        // YOUR CODE HERE (Done?)
         this._col1 = col1;
         this._col2 = col2;
         this._relation = relation;
@@ -37,8 +29,7 @@ class Condition {
      *  from which my columns are selected, returns the result of
      *  performing the test I denote. */
     boolean test(Integer... rows) {
-        // REPLACE WITH SOLUTION (Done?)
-        String val1 = _col1.getFrom(rows)
+        String val1 = _col1.getFrom(rows);
         String val2;
         if (_val2 == null) {
             val2 = _col2.getFrom(rows);
@@ -46,31 +37,30 @@ class Condition {
             val2 = _val2;
         }
 
-        int cmp = val2.compareTo(val2);
+        int cmp = val1.compareTo(val2);
 
-        switch(_relation) {
-            case "<":
-                return cmp < 0;
-            case ">":
-                return cmp > 0;
-            case "<=":
-                return cmp <= 0;
-            case ">=":
-                return cmp >= 0;
-            case "=":
-                return cmp == 0;
-            case "!=":
-                return cmp != 0;
-            default:
-                return false;
+        switch (_relation) {
+        case "<":
+            return cmp < 0;
+        case ">":
+            return cmp > 0;
+        case "<=":
+            return cmp <= 0;
+        case ">=":
+            return cmp >= 0;
+        case "=":
+            return cmp == 0;
+        case "!=":
+            return cmp != 0;
+        default:
+            return false;
         }
-        return false;
     }
 
     /** Return true iff ROWS satisfies all CONDITIONS. */
     static boolean test(List<Condition> conditions, Integer... rows) {
-        for (Condition cond : conditions) {
-            if (!cond.test(rows)) {
+        for (Condition condition : conditions) {
+            if (!condition.test(rows)) {
                 return false;
             }
         }
@@ -82,6 +72,6 @@ class Condition {
     private Column _col1, _col2;
     /** Second operand, if literal (otherwise null). */
     private String _val2;
-    // ADD ADDITIONAL FIELDS HERE
+    /** The relation string to use in a test. */
     private String _relation;
 }
