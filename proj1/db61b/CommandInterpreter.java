@@ -179,19 +179,22 @@ class CommandInterpreter {
         int cols = table.columns();
 
         String[] values = new String[cols];
-        _input.next("(");
-
-        int k = 0;
         while (true) {
-            values[k] = literal();
-            k++;
+            _input.next("(");
+            int k = 0;
+            while (true) {
+                values[k] = literal();
+                k++;
+                if (!_input.nextIf(",")) {
+                    break;
+                }
+            }
+            table.add(values);
+            _input.next(")");
             if (!_input.nextIf(",")) {
                 break;
             }
         }
-        table.add(values);
-
-        _input.next(")");
         _input.next(";");
     }
 
