@@ -220,6 +220,7 @@ class CommandInterpreter {
         _input.next("print");
         String name = name();
         Table table = _database.get(name);
+        System.out.println("Contents of " + name + ";");
         table.print();
         _input.next(";");
     }
