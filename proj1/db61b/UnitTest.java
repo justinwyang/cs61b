@@ -69,10 +69,15 @@ public class UnitTest {
     }
 
     @Test
-    public void testSort() {
-        System.out.println("testSort\n");
-        Table table1 = Table.readTable("testing/enrolled");
-        table1.print();
+    public void testException() {
+        System.out.println("testException\n");
+        Table table = Table.readTable("testing/students");
+        ArrayList<String> columnNames = new ArrayList<>(
+                Arrays.asList("Lastname", "Major"));
+        ArrayList<Condition> conditions = new ArrayList<>(
+                Arrays.asList(new Condition(new Column(
+                        "Minor", table), "=", "EECS")));
+        Table selected = table.select(table, columnNames, conditions);
         System.out.println();
     }
 
