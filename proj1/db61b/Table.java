@@ -91,7 +91,7 @@ class Table {
 
         int idx = size() - 1;
         for (int i = 0; i < size() - 1; i++) {
-            int cmp = compareRows(i, size() - 1);
+            int cmp = compareRows(_index.get(i), size() - 1);
             if (cmp == 0) {
                 removeFinalRow();
                 return false;

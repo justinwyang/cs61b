@@ -68,6 +68,14 @@ public class UnitTest {
         System.out.println();
     }
 
+    @Test
+    public void testSort() {
+        System.out.println("testSort\n");
+        Table table1 = Table.readTable("testing/enrolled");
+        table1.print();
+        System.out.println();
+    }
+
 
     /** Run the JUnit tests in this package. Add xxxTest.class entries to
      *  the arguments of runClasses to run other JUnit tests. */
