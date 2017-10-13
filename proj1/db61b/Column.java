@@ -17,6 +17,9 @@ class Column {
         _tableIndex = 0;
         _name = name;
         for (Table table : tables) {
+            if (table == null) {
+                continue;
+            }
             _column = table.findColumn(name);
             if (_column != -1) {
                 _table = table;

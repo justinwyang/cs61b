@@ -78,6 +78,7 @@ public class UnitTest {
                 Arrays.asList(new Condition(new Column(
                         "Minor", table), "=", "EECS")));
         Table selected = table.select(table, columnNames, conditions);
+        selected.print();
         System.out.println();
     }
 
