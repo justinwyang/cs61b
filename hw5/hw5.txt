@@ -9,7 +9,7 @@ Question D.
 2. Simple: omega(logx), O(logx). Tight: O(logx)
 
 
-3. theta(N^2): If we run i from 0 to N and j from 0 to i, then the time we get is 1 + 2 + ... + N. This
+3. omega(N^2), O(N^2), theta(N^2): If we run i from 0 to N and j from 0 to i, then the time we get is 1 + 2 + ... + N. This
 evaluates to N(N + 1) / 2, which simplifies to N^2.
 
 
