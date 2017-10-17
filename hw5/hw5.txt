@@ -3,25 +3,39 @@ HW #5.
 
 Question D.
 
-1.
+1. Simple: omega(logx), O(x^2). Tight: theta(x^2)
 
 
-2.
+2. Simple: omega(logx), O(logx). Tight: O(logx)
 
 
-3.
+3. theta(N^2): If we run i from 0 to N and j from 0 to i, then the time we get is 1 + 2 + ... + N. This
+evaluates to N(N + 1) / 2, which simplifies to N^2.
 
 
-4.
+4. theta(M+N): Although there is a nested loop for variable j, this loop will only loop j from 0 to M, after
+which it will no longer execute any more, as j is declared in an outer scope. So there is O(N) for the
+outer loop, and O(M) for the inner loop, added together.
 
 
-5.
+5. theta(nlogn): Each call to f1 will execute theta(x) for whatever x is passed. If we look at f5, then first,
+f1(n) is executed, and since f5(n/2) is called twice, then f1(n/2) is called twice. This continues on, so
+f1(n/4) is called 4 times, etc. This, N + (N/2 + N/2) + (N/4 + N/4 + N/4 + N/4) + ... Each value in the
+parenthasis evaluates to n. Since the depth of recursion is logn (as we call by n/2 each time) the total
+time is theta(nlogn)
 
 
-6.
+6. By rules of logarithms, log_10(f(x)) = log_b(f(x)) / log_b(10). Thus, if we define K = 2 * log_b(10),
+then |K * log_10(f(x))| = |2 * log_b(f(x))| > |log_b(f(x))|, so log_b(f(x)) is in O(log_10(f(x))).
+Similarly, if K = 2 * log_b(10), then |K * log_10(f(x))| < |log_b(f(x))| and log_b(f(x)) is in
+omega(log_10(f(x))), so log_b(f(x)) is in theta(log_10(f(x)))
 
 
-7.
+7. If P is a polynomial, then we only need to consider the highest order term, let's call it ax^n. Taking
+the logarithm, then we get log(ax^n) = log(a) + nlog(x) by rules of logarithms. If we consider klog(x), where
+k > n, then we get |log(ax^n)| = |log(a) + nlog(x)| < klog(x), so thus log(p(x)) is in O(logx).
 
 
-8.
+8. We can say that ceil(f(x)) = f(x) + offset(x), where 0 <= offset(x) < 1 always. As a result,
+ceil(f(x)) < f(x) + 1. We know that f(x) + 1 < K * f(x) if K is a large enough constant, so thus
+ceil(f(x)) < K * f(x). Thus ceil(f(x)) is in O(f(x))
