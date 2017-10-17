@@ -3,7 +3,7 @@ HW #5.
 
 Question D.
 
-1. Simple: omega(logx), O(x^3). Tight: theta(x^2)
+1. Simple: omega(x^2), O(x^2). Tight: theta(x^2)
 
 
 2. Simple: omega(logx), O(logx). Tight: O(logx)
