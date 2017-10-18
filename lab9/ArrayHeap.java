@@ -155,7 +155,7 @@ public class ArrayHeap<T> {
 
     /* Bubbles up the node currently at the given index. */
     private void bubbleUp(int index) {
-        while (min(index, getParentOf(index)) != index) {
+        while (index > 1 && min(index, getParentOf(index)) == index) {
             swap(index, getParentOf(index));
             index = getParentOf(index);
         }
@@ -163,9 +163,17 @@ public class ArrayHeap<T> {
 
     /* Bubbles down the node currently at the given index. */
     private void bubbleDown(int index) {
-        while (min(index, min(getLeftOf(index),
-                getRightOf(index))) != index) {
-            int nextIndex = min(getLeftOf(index), getRightOf(index));
+        while (index <= size() / 2) {
+            int nextIndex = index;
+            if (getLeftOf(index) <= size()) {
+                nextIndex = min(nextIndex, getLeftOf(index));
+            }
+            if (getRightOf(index) <= size()) {
+                nextIndex = min(nextIndex, getRightOf(index));
+            }
+            if (nextIndex == index) {
+                break;
+            }
             swap(index, nextIndex);
             index = nextIndex;
         }
@@ -174,15 +182,16 @@ public class ArrayHeap<T> {
     /* Inserts an item with the given priority value. Same as enqueue, or offer. */
     public void insert(T item, double priority) {
         Node node = new Node(item, priority);
-        setNode(size(), node);
+        setNode(size() + 1, node);
         bubbleUp(size());
     }
 
     /* Returns the element with the smallest priority value, and removes it from
      * the heap. Same as dequeue, or poll. */
     public T removeMin() {
-        swap(1, size() - 1);
-        Node node = removeNode(size() - 1);
+        Node node = peek();
+        swap(1, size());
+        removeNode(size());
         bubbleDown(1);
         return node.item();
     }
