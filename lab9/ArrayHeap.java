@@ -17,7 +17,7 @@ public class ArrayHeap<T> {
         contents.add(null);
     }
 
-    /* Returns the number of elments in the priority queue. */
+    /* Returns the number of elements in the priority queue. */
     public int size() {
         return contents.size() - 1;
     }
@@ -33,8 +33,6 @@ public class ArrayHeap<T> {
 
     /* Sets the node at INDEX to N */
     private void setNode(int index, Node n) {
-        // In the case that the ArrayList is not big enough
-        // add null elements until it is the right size
         while (index + 1 > contents.size()) {
             contents.add(null);
         }
@@ -119,73 +117,89 @@ public class ArrayHeap<T> {
 
     /* Returns the index of the node to the left of the node at i. */
     private int getLeftOf(int i) {
-        //YOUR CODE HERE
-        return 0;
+        return i * 2;
     }
 
     /* Returns the index of the node to the right of the node at i. */
     private int getRightOf(int i) {
-        //YOUR CODE HERE
-        return 0;
+        return i * 2 + 1;
     }
 
     /* Returns the index of the node that is the parent of the node at i. */
     private int getParentOf(int i) {
-        //YOUR CODE HERE
-        return 0;
+        return i / 2;
     }
 
     /* Adds the given node as a left child of the node at the given index. */
     private void setLeft(int index, Node n) {
-        //YOUR CODE HERE
+        setNode(getLeftOf(index), n);
     }
 
     /* Adds the given node as the right child of the node at the given index. */
     private void setRight(int index, Node n) {
-        //YOUR CODE HERE
+        setNode(getRightOf(index), n);
     }
 
     /** Returns the index of the node with smaller priority. Precondition: not
       * both nodes are null. */
     private int min(int index1, int index2) {
-        //YOUR CODE HERE
-        return 0;
+        return getNode(index1).priority() <
+                getNode(index2).priority() ? index1 : index2;
     }
 
     /* Returns the Node with the smallest priority value, but does not remove it
      * from the heap. */
     public Node peek() {
-        //YOUR CODE HERE
-        return null;
+        return getNode(1);
     }
 
     /* Bubbles up the node currently at the given index. */
     private void bubbleUp(int index) {
-        //YOUR CODE HERE
+        while (min(index, getParentOf(index)) != index) {
+            swap(index, getParentOf(index));
+            index = getParentOf(index);
+        }
     }
 
     /* Bubbles down the node currently at the given index. */
     private void bubbleDown(int index) {
-        //YOUR CODE HERE
+        while (min(index, min(getLeftOf(index),
+                getRightOf(index))) != index) {
+            int nextIndex = min(getLeftOf(index), getRightOf(index));
+            swap(index, nextIndex);
+            index = nextIndex;
+        }
     }
 
     /* Inserts an item with the given priority value. Same as enqueue, or offer. */
     public void insert(T item, double priority) {
-        //YOUR CODE HERE
+        Node node = new Node(item, priority);
+        setNode(size(), node);
+        bubbleUp(size());
     }
 
     /* Returns the element with the smallest priority value, and removes it from
      * the heap. Same as dequeue, or poll. */
     public T removeMin() {
-        //YOUR CODE HERE
-        return null;
+        swap(1, size() - 1);
+        Node node = removeNode(size() - 1);
+        bubbleDown(1);
+        return node.item();
     }
 
     /* Changes the node in this heap with the given item to have the given
      * priority. You can assume the heap will not have two nodes with the same
      * item. Check for item equality with .equals(), not == */
     public void changePriority(T item, double priority) {
-        //YOUR CODE HERE
+        int idx = -1;
+        for (int i = 1; i < contents.size(); i++) {
+            if (contents.get(i).item().equals(item)) {
+                idx = i;
+                contents.get(i).setPriority(priority);
+            }
+        }
+        bubbleUp(idx);
+        bubbleDown(idx);
     }
 
 }
