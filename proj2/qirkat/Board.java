@@ -17,13 +17,12 @@ import static qirkat.Move.*;
  *  counting from 0).
  *
  *  Moves on this board are denoted by Moves.
- *  @author
+ *  @author Justin Yang
  */
 class Board extends Observable {
 
     /** A new, cleared board at the start of the game. */
     Board() {
-        // FIXME?
         clear();
     }
 
@@ -44,7 +43,12 @@ class Board extends Observable {
         _whoseMove = WHITE;
         _gameOver = false;
 
-        // FIXME
+        _board = new PieceColor[Move.SIDE * Move.SIDE];
+        for (char c = 'a'; c <= 'e'; c++) {
+            for (char r = '1'; r <= '5'; r++) {
+                set(c, r, EMPTY);
+            }
+        }
 
         setChanged();
         notifyObservers();
@@ -57,7 +61,13 @@ class Board extends Observable {
 
     /** Copy B into me. */
     private void internalCopy(Board b) {
-        // FIXME
+        _gameOver = b._gameOver;
+        _whoseMove = b._whoseMove;
+        for (char c = 'a'; c <= 'e'; c++) {
+            for (char r = '1'; r <= '5'; r++) {
+                set(c, r, b.get(c, r));
+            }
+        }
     }
 
     /** Set my contents as defined by STR.  STR consists of 25 characters,
@@ -94,7 +104,7 @@ class Board extends Observable {
             }
         }
 
-        // FIXME
+        _whoseMove = nextMove;
 
         setChanged();
         notifyObservers();
@@ -110,31 +120,32 @@ class Board extends Observable {
      *  and '1' <= R <= '5'.  */
     PieceColor get(char c, char r) {
         assert validSquare(c, r);
-        return get(index(c, r)); // FIXME?
+        return get(index(c, r));
     }
 
     /** Return the current contents of the square at linearized index K. */
     PieceColor get(int k) {
         assert validSquare(k);
-        return null; // FIXME
+        return _board[k];
     }
 
     /** Set get(C, R) to V, where 'a' <= C <= 'e', and
      *  '1' <= R <= '5'. */
     private void set(char c, char r, PieceColor v) {
         assert validSquare(c, r);
-        set(index(c, r), v);  // FIXME?
+        set(index(c, r), v);
     }
 
     /** Set get(K) to V, where K is the linearized index of a square. */
     private void set(int k, PieceColor v) {
         assert validSquare(k);
-        // FIXME
+        _board[k] = v;
     }
 
     /** Return true iff MOV is legal on the current board. */
     boolean legalMove(Move mov) {
-        return false; // FIXME
+        return mov.validSquare(mov.fromIndex()) &&
+                mov.validSquare(mov.toIndex());
     }
 
     /** Return a list of all legal moves from the current position. */
@@ -164,6 +175,11 @@ class Board extends Observable {
      *  with linearized index K to MOVES. */
     private void getMoves(ArrayList<Move> moves, int k) {
         // FIXME
+        for (Move move : moves) {
+            if (move.fromIndex() == k) {
+
+            }
+        }
     }
 
     /** Add all legal captures from the position with linearized index K
@@ -308,4 +324,7 @@ class Board extends Observable {
             notifyObservers(arg);
         }
     }
+
+    /** Stores the contents of the board in an array. */
+    private PieceColor[] _board;
 }

@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
  *  each distinct Move.  A "vestigial" move represents a single board
  *  position, as opposed to a move (its starting and ending rows are
  *  equal, likewise columns).
- *  @author
+ *  @author Justin Yang
  */
 class Move {
 
@@ -108,12 +108,14 @@ class Move {
             return move0;
         }
         if (move0.isVestigial()) {
-            return null; // FIXME
+            return move1;
         }
         if (move0.jumpTail() == null) {
-            return null; // FIXME
+            move0._nextJump = move1;
+            return move0;
         } else {
-            return null; // FIXME
+            move0._nextJump = move(move0.jumpTail(), move1);
+            return move0;
         }
 
     }
@@ -159,13 +161,15 @@ class Move {
     /** Return true iff this is a horizontal, non-capturing move to
      *  the left. */
     boolean isLeftMove() {
-        return false; // FIXME
+        return col0() - col1() == 1 &&
+                row0() == row1();
     }
 
     /** Return true iff this is a horizontal, non-capturing move
      *  to the right. */
     boolean isRightMove() {
-        return false; // FIXME
+        return col0() - col1() == -1 &&
+                row0() == row1();
     }
 
     /** Returns the source column. */
@@ -191,13 +195,13 @@ class Move {
     /** For a jump, returns the row of the jumped-over square for the
      *  first leg of the jump.  For a non-capturing move, same as row1(). */
     char jumpedRow() {
-        return '1';  // FIXME
+        return (char)(((int)row0() + (int)row1()) / 2);
     }
 
     /** For a jump, returns the column of the jumped-over square for the
      *  first leg of the jump.  For a non-capturing move, same as col1(). */
     char jumpedCol() {
-        return 'a'; // FIXME
+        return (char)(((int)col0() + (int)col1()) / 2);
     }
 
     /** Return the linearized index of my source square. */
@@ -271,7 +275,13 @@ class Move {
 
     /** Write my string representation into OUT. */
     private void toString(Formatter out) {
-        out.format("???"); // FIXME
+        String s = " " + col0() + row0();
+        if (jumpTail() == null) {
+            s += "-" + col1() + row1();
+        } else {
+            s += "-" + jumpTail().toString();
+        }
+        out.format(s);
     }
 
     /** Set me to COL0 ROW0 - COL1 ROW1 - NEXTJUMP. */
