@@ -16,6 +16,7 @@ public class ListUtilities {
 		for (int i = 0; i < input.size(); i++) {
 			if (!predicate.test(input.get(i))) {
 				input.remove(i);
+				i--;
 			}
 		}
 
