@@ -43,12 +43,14 @@ class Board extends Observable {
         _whoseMove = WHITE;
         _gameOver = false;
 
+        // FIXME
         _board = new PieceColor[Move.SIDE * Move.SIDE];
         for (char c = 'a'; c <= 'e'; c++) {
             for (char r = '1'; r <= '5'; r++) {
                 set(c, r, EMPTY);
             }
         }
+        _moves = new MoveList();
 
         setChanged();
         notifyObservers();
@@ -61,6 +63,7 @@ class Board extends Observable {
 
     /** Copy B into me. */
     private void internalCopy(Board b) {
+        // FIXME
         _gameOver = b._gameOver;
         _whoseMove = b._whoseMove;
         for (char c = 'a'; c <= 'e'; c++) {
@@ -104,6 +107,7 @@ class Board extends Observable {
             }
         }
 
+        // FIXME
         _whoseMove = nextMove;
 
         setChanged();
@@ -175,9 +179,9 @@ class Board extends Observable {
      *  with linearized index K to MOVES. */
     private void getMoves(ArrayList<Move> moves, int k) {
         // FIXME
-        for (Move move : moves) {
+        for (Move move : _moves) {
             if (move.fromIndex() == k) {
-
+                moves.add(move);
             }
         }
     }
@@ -265,6 +269,18 @@ class Board extends Observable {
     String toString(boolean legend) {
         Formatter out = new Formatter();
         // FIXME
+        String s = "";
+        for (char r  = '5'; r >= '1'; r--) {
+            s += " ";
+            if (legend) {
+                s += " " + r;
+            }
+            for (char c = 'a'; c <= 'e'; c++) {
+                s += " " + get(c, r);
+            }
+            s += "\n";
+        }
+        out.format(s);
         return out.toString();
     }
 
@@ -327,4 +343,7 @@ class Board extends Observable {
 
     /** Stores the contents of the board in an array. */
     private PieceColor[] _board;
+
+    /** Stores the current list of moves. */
+    private MoveList _moves;
 }

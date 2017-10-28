@@ -275,7 +275,7 @@ class Move {
 
     /** Write my string representation into OUT. */
     private void toString(Formatter out) {
-        String s = " " + col0() + row0();
+        String s = "" + col0() + row0();
         if (jumpTail() == null) {
             s += "-" + col1() + row1();
         } else {
