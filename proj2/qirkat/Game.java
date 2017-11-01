@@ -17,7 +17,7 @@ import static qirkat.Command.Type.*;
 import static qirkat.GameException.error;
 
 /** Controls the play of the game.
- *  @author
+ *  @author Justin Yang
  */
 class Game {
 

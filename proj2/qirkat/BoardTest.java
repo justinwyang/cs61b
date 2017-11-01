@@ -4,7 +4,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /** Tests of the Board class.
- *  @author
+ *  @author Justin Yang
  */
 public class BoardTest {
 
@@ -38,6 +38,7 @@ public class BoardTest {
         Board b0 = new Board();
         makeMoves(b0, GAME1);
         assertEquals(GAME1_BOARD, b0.toString());
+
     }
 
     @Test
@@ -49,6 +50,7 @@ public class BoardTest {
         for (int i = 0; i < GAME1.length; i += 1) {
             b0.undo();
         }
+
         assertEquals("failed to return to start", b1, b0);
         makeMoves(b0, GAME1);
         assertEquals("second pass failed to reach same position", b2, b0);

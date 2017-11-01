@@ -51,6 +51,7 @@ public class BSTStringSetRangeTest {
 
     /** ARGS = [ random seed, size of WORDS1, low bound, high bound ]. */
     public static void main(String[] args) {
+        args = new String[]{"231", "1234", "jehjklrq", "plvckxj"};
         long seed = Long.parseLong(args[0]);
         int N = Integer.parseInt(args[1]);
         _low = args[2];

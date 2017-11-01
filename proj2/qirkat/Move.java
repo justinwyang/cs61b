@@ -111,11 +111,10 @@ class Move {
             return move1;
         }
         if (move0.jumpTail() == null) {
-            move0._nextJump = move1;
-            return move0;
+            return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(), move1);
         } else {
-            move0._nextJump = move(move0.jumpTail(), move1);
-            return move0;
+            return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(),
+                    move(move0.jumpTail(), move1));
         }
 
     }
