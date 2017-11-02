@@ -378,7 +378,7 @@ class Board extends Observable {
         }
         Board b = (Board)o;
         return _whoseMove.equals(b._whoseMove) && _gameOver == b._gameOver &&
-                Arrays.equals(_board, b._board) && _moves.equals(b._moves);
+                Arrays.equals(_board, b._board) /*&& _moves.equals(b._moves)*/;
     }
 
     /** Return true iff there is a move for the current player. */
