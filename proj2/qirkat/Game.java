@@ -199,6 +199,9 @@ class Game {
     /** Perform the command 'dump'. */
     void doDump(String[] unused) {
         // FIXME
+        System.out.println("---");
+        System.out.println(_board);
+        System.out.println("---");
     }
 
     /** Execute 'seed OPERANDS[0]' command, where the operand is a string

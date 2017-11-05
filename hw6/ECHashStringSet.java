@@ -60,7 +60,7 @@ class ECHashStringSet implements StringSet {
     public List<String> asList() {
         StringList list = new StringList();
         for (StringList bucket: _buckets) {
-            if (list != null) {
+            if (bucket != null) {
                 for (String s: bucket) {
                     list.add(s);
                 }
