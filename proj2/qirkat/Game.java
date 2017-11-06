@@ -128,6 +128,7 @@ class Game {
     void doAuto(String[] operands) {
         _state = SETUP;
         // FIXME
+
     }
 
     /** Perform a 'help' command. */
@@ -168,6 +169,13 @@ class Game {
     void doManual(String[] operands) {
         _state = SETUP;
         // FIXME
+        if (operands[0].toLowerCase().equals(WHITE.toString())) {
+            _whiteIsManual = true;
+        } else if (operands[0].toLowerCase().equals(BLACK.toString())) {
+            _blackIsManual = true;
+        } else {
+            throw error("");
+        }
     }
 
     /** Exit the program. */
@@ -184,24 +192,28 @@ class Game {
     /** Perform the move OPERANDS[0]. */
     void doMove(String[] operands) {
         // FIXME
+        Move mov = Move.parseMove(operands[0]);
+        _board.makeMove(mov);
     }
 
     /** Perform the command 'clear'. */
     void doClear(String[] unused) {
         // FIXME
+        _board.clear();
+        _state = State.SETUP;
     }
 
     /** Perform the command 'set OPERANDS[0] OPERANDS[1]'. */
     void doSet(String[] operands) {
         // FIXME
+        _board.setPieces(operands[1], PieceColor.parse(operands[0]));
+
     }
 
     /** Perform the command 'dump'. */
     void doDump(String[] unused) {
         // FIXME
-        System.out.println("---");
-        System.out.println(_board);
-        System.out.println("---");
+        _reporter.moveMsg(String.format("===\n%s\n===", _board));
     }
 
     /** Execute 'seed OPERANDS[0]' command, where the operand is a string

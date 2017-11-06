@@ -111,7 +111,8 @@ class Move {
             return move1;
         }
         if (move0.jumpTail() == null) {
-            return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(), move1);
+            return move(move0.col0(), move0.row0(),
+                    move0.col1(), move0.row1(), move1);
         } else {
             return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(),
                     move(move0.jumpTail(), move1));
@@ -160,15 +161,13 @@ class Move {
     /** Return true iff this is a horizontal, non-capturing move to
      *  the left. */
     boolean isLeftMove() {
-        return col0() - col1() == 1 &&
-                row0() == row1();
+        return col0() - col1() == 1 && row0() == row1();
     }
 
     /** Return true iff this is a horizontal, non-capturing move
      *  to the right. */
     boolean isRightMove() {
-        return col0() - col1() == -1 &&
-                row0() == row1();
+        return col0() - col1() == -1 && row0() == row1();
     }
 
     /** Returns the source column. */
@@ -194,13 +193,13 @@ class Move {
     /** For a jump, returns the row of the jumped-over square for the
      *  first leg of the jump.  For a non-capturing move, same as row1(). */
     char jumpedRow() {
-        return (char)(((int)row0() + (int)row1()) / 2);
+        return (char) (((int) row0() + (int) row1()) / 2);
     }
 
     /** For a jump, returns the column of the jumped-over square for the
      *  first leg of the jump.  For a non-capturing move, same as col1(). */
     char jumpedCol() {
-        return (char)(((int)col0() + (int)col1()) / 2);
+        return (char) (((int) col0() + (int) col1()) / 2);
     }
 
     /** Return the linearized index of my source square. */

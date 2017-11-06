@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
 import static qirkat.PieceColor.*;
 
 /** Widget for displaying a Qirkat board.
- *  @author
+ *  @author Justin Yang
  */
 class BoardWidget extends Pad implements Observer {
 

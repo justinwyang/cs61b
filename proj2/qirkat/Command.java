@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import static qirkat.PieceColor.*;
 
 /** All things to do with parsing commands.
- *  @author
+ *  @author Paul N. Hilfinger
  */
 class Command {
 

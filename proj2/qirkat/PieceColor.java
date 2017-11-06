@@ -1,5 +1,7 @@
 package qirkat;
 
+import static qirkat.GameException.error;
+
 /** Describes the classes of Piece on a Qirkat board.
  *  @author P. N. Hilfinger
  */
@@ -39,6 +41,24 @@ enum PieceColor {
     /** Return true iff I denote a piece rather than an empty square. */
     boolean isPiece() {
         return false;
+    }
+
+    /** Parses a string into a PieceValue.
+     *
+     * @param s the string to be parsed
+     * @return the PieceValue outcome
+     */
+    static PieceColor parse(String s) {
+        if (s.toLowerCase().equals("empty")) {
+            return EMPTY;
+        }
+        if (s.toLowerCase().equals("white")) {
+            return WHITE;
+        }
+        if (s.toLowerCase().equals("black")) {
+            return BLACK;
+        }
+        throw error("Piece Color %s not valid", s);
     }
 
     /** Return the standard one-character denotation of this piece ('b', 'w',

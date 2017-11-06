@@ -55,7 +55,7 @@ class Board extends Observable {
                 } else {
                     if (c < 'c') {
                         set(c, r, BLACK);
-                    } else if (c > 'c'){
+                    } else if (c > 'c') {
                         set(c, r, WHITE);
                     } else {
                         set(c, r, EMPTY);
@@ -77,14 +77,15 @@ class Board extends Observable {
     /** Copy B into me. */
     private void internalCopy(Board b) {
         // FIXME
-        clear();
         this._gameOver = b._gameOver;
         this._whoseMove = b._whoseMove;
+        _board = new PieceColor[Move.SIDE * Move.SIDE];
         for (char c = 'a'; c <= 'e'; c++) {
             for (char r = '1'; r <= '5'; r++) {
                 set(c, r, b.get(c, r));
             }
         }
+        this._moves = new MoveList();
         for (Move mov: b._moves) {
             this._moves.add(mov);
         }
@@ -165,8 +166,8 @@ class Board extends Observable {
 
     /** Return true iff MOV is legal on the current board. */
     boolean legalMove(Move mov) {
-        return mov.validSquare(mov.fromIndex()) &&
-                mov.validSquare(mov.toIndex());
+        return mov.validSquare(mov.fromIndex())
+                && mov.validSquare(mov.toIndex());
     }
 
     /** Return a list of all legal moves from the current position. */
@@ -208,7 +209,8 @@ class Board extends Observable {
     private void getJumps(ArrayList<Move> moves, int k) {
         // FIXME
         for (Move mov : _moves) {
-            if (legalMove(mov) && mov.fromIndex() == k && checkJump(mov, true)) {
+            if (legalMove(mov) && mov.fromIndex() == k
+                    && checkJump(mov, true)) {
                 moves.add(mov);
             }
         }
@@ -222,9 +224,12 @@ class Board extends Observable {
         if (mov == null) {
             return true;
         }
-        PieceColor midPiece = get((char)((mov.col0() + mov.col1()) / 2), (char)((mov.row0() + mov.row1()) / 2));
-        boolean valid = legalMove(mov) && mov.isJump() && get(mov.toIndex()).equals(EMPTY) &&
-                !midPiece.equals(EMPTY) && !midPiece.equals(get(mov.fromIndex()));
+        PieceColor midPiece = get((char) ((mov.col0() + mov.col1()) / 2),
+                (char) ((mov.row0() + mov.row1()) / 2));
+        boolean valid = legalMove(mov) && mov.isJump()
+                && get(mov.toIndex()).equals(EMPTY)
+                && !midPiece.equals(EMPTY)
+                && !midPiece.equals(get(mov.fromIndex()));
         if (mov.jumpTail() != null) {
             if (allowPartial) {
                 return valid && checkJump(mov.jumpTail(), allowPartial);
@@ -253,7 +258,8 @@ class Board extends Observable {
                 if (dr == 0 && dc == 0) {
                     continue;
                 }
-                if (checkJump(move(c, r, (char)((int)c + dc), (char)((int)r + dr), null), false)) {
+                if (checkJump(move(c, r, (char) ((int) c + dc),
+                        (char) ((int) r + dr), null), false)) {
                     return true;
                 }
             }
@@ -303,14 +309,15 @@ class Board extends Observable {
                 for (; mov != null; mov = mov.jumpTail()) {
                     set(mov.col1(), mov.row1(), _whoseMove);
                     set(mov.col0(), mov.row0(), EMPTY);
-                    set((char)((mov.col0() + mov.col1()) / 2), (char)((mov.row0() + mov.row1()) / 2), EMPTY);
+                    set((char) ((mov.col0() + mov.col1()) / 2),
+                            (char) ((mov.row0() + mov.row1()) / 2), EMPTY);
                 }
             }
         } else {
             set(mov.col1(), mov.row1(), get(mov.col0(), mov.row0()));
             set(mov.col0(), mov.row0(), EMPTY);
         }
-        _whoseMove = (_whoseMove.equals(WHITE)) ? BLACK : WHITE;
+        _whoseMove = _whoseMove.opposite();
 
         setChanged();
         notifyObservers();
@@ -321,7 +328,7 @@ class Board extends Observable {
         // FIXME
         if (_moves.size() != 0) {
             Move mov = _moves.remove(_moves.size() - 1);
-            PieceColor mover = (_whoseMove.equals(WHITE)) ? BLACK : WHITE;
+            PieceColor mover = _whoseMove.opposite();
             if (mov.isJump()) {
                 MoveList list = new MoveList();
                 for (; mov != null; mov = mov.jumpTail()) {
@@ -331,13 +338,15 @@ class Board extends Observable {
                     Move curMov = list.get(i);
                     set(curMov.col0(), curMov.row0(), mover);
                     set(curMov.col1(), curMov.row1(), EMPTY);
-                    set((char)((curMov.col0() + curMov.col1()) / 2), (char)((curMov.row0() + curMov.row1()) / 2), _whoseMove);
+                    set((char) ((curMov.col0() + curMov.col1()) / 2),
+                            (char) ((curMov.row0() + curMov.row1()) / 2),
+                            _whoseMove);
                 }
             } else {
                 set(mov.col0(), mov.row0(), mover);
                 set(mov.col1(), mov.row1(), EMPTY);
             }
-            _whoseMove = (_whoseMove.equals(WHITE)) ? BLACK : WHITE;
+            _whoseMove = _whoseMove.opposite();
         }
 
         setChanged();
@@ -376,9 +385,15 @@ class Board extends Observable {
         if (!(o instanceof Board)) {
             return false;
         }
-        Board b = (Board)o;
-        return _whoseMove.equals(b._whoseMove) && _gameOver == b._gameOver &&
-                Arrays.equals(_board, b._board) /*&& _moves.equals(b._moves)*/;
+        Board b = (Board) o;
+        return _whoseMove.equals(b._whoseMove) && _gameOver == b._gameOver
+                && Arrays.equals(_board, b._board)
+                /*&& _moves.equals(b._moves)*/;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     /** Return true iff there is a move for the current player. */

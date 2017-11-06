@@ -1,7 +1,7 @@
 package qirkat;
 
 /** A generic Qirkat Player.
- *  @author
+ *  @author Paul N. Hilfinger
  */
 abstract class Player {
 
