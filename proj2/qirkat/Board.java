@@ -46,24 +46,8 @@ class Board extends Observable {
 
         // FIXME
         _board = new PieceColor[Move.SIDE * Move.SIDE];
-        for (char c = 'a'; c <= 'e'; c++) {
-            for (char r = '1'; r <= '5'; r++) {
-                if (r < '3') {
-                    set(c, r, WHITE);
-                } else if (r > '3') {
-                    set(c, r, BLACK);
-                } else {
-                    if (c < 'c') {
-                        set(c, r, BLACK);
-                    } else if (c > 'c') {
-                        set(c, r, WHITE);
-                    } else {
-                        set(c, r, EMPTY);
-                    }
-                }
-            }
-        }
         _moves = new MoveList();
+        setPieces(INIT_BOARD, WHITE);
 
         setChanged();
         notifyObservers();
@@ -126,7 +110,8 @@ class Board extends Observable {
         }
 
         // FIXME
-        _whoseMove = nextMove;
+        this._whoseMove = nextMove;
+        this._gameOver = !isMove();
 
         setChanged();
         notifyObservers();
@@ -197,10 +182,8 @@ class Board extends Observable {
      *  with linearized index K to MOVES. */
     private void getMoves(ArrayList<Move> moves, int k) {
         // FIXME
-        for (Move move : _moves) {
-            if (legalMove(move) && move.fromIndex() == k) {
-                moves.add(move);
-            }
+        for (Move move : generateMoves(k, 1)) {
+            moves.add(move);
         }
     }
 
@@ -208,12 +191,43 @@ class Board extends Observable {
      *  to MOVES. */
     private void getJumps(ArrayList<Move> moves, int k) {
         // FIXME
-        for (Move mov : _moves) {
-            if (legalMove(mov) && mov.fromIndex() == k
-                    && checkJump(mov, true)) {
-                moves.add(mov);
+        for (Move move : generateMoves(k, 2)) {
+            if (checkJump(move, true)) {
+                moves.add(move);
             }
         }
+    }
+
+    /** Generates a list of possible moves.
+     *
+     * @param k the index
+     * @param len the length of jump
+     * @return a list of moves
+     */
+    private MoveList generateMoves(int k, int len) {
+        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
+        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
+
+        char c = Move.col(k), r = Move.row(k);
+        int type;
+        if ((c - 'a') % 2 == (r - '1') % 2) {
+            type = 4;
+        } else {
+            type = 8;
+        }
+
+        MoveList list = new MoveList();
+
+        for (int i = 0; i < type; i++) {
+            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
+                continue;
+            }
+            char nc = (char) ((int) c + len * dc[i]), nr = (char) ((int) r + len * dr[i]);
+            if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
+                list.add(Move.move(c, r, nc, nr));
+            }
+        }
+        return list;
     }
 
     /** Return true iff MOV is a valid jump sequence on the current board.
@@ -221,23 +235,22 @@ class Board extends Observable {
      *  could be continued and are valid as far as they go.  */
     boolean checkJump(Move mov, boolean allowPartial) {
         // FIXME
-        if (mov == null) {
-            return true;
+        if (!validSquare(mov.fromIndex()) || get(mov.fromIndex()).equals(EMPTY)) {
+            return false;
         }
-        PieceColor midPiece = get((char) ((mov.col0() + mov.col1()) / 2),
-                (char) ((mov.row0() + mov.row1()) / 2));
-        boolean valid = legalMove(mov) && mov.isJump()
-                && get(mov.toIndex()).equals(EMPTY)
-                && !midPiece.equals(EMPTY)
-                && !midPiece.equals(get(mov.fromIndex()));
-        if (mov.jumpTail() != null) {
-            if (allowPartial) {
-                return valid && checkJump(mov.jumpTail(), allowPartial);
-            } else {
+        PieceColor color = get(mov.fromIndex());
+        boolean began = false;
+        while (mov != null) {
+            if (!validSquare(mov.toIndex()) || !get(mov.toIndex()).equals(EMPTY)) {
+                return allowPartial && began;
+            }
+            if (!get(mov.toIndex()).equals(color.opposite())) {
                 return false;
             }
+            mov = mov.jumpTail();
+            began = true;
         }
-        return valid;
+        return true;
     }
 
     /** Return true iff a jump is possible for a piece at position C R. */
@@ -249,19 +262,14 @@ class Board extends Observable {
      *  linearized index K. */
     boolean jumpPossible(int k) {
         // FIXME
-        char r = Move.row(k), c = Move.col(k);
-        if (get(k).equals(EMPTY)) {
+        if (!get(k).equals(whoseMove())) {
             return false;
         }
-        for (int dc = (get(k).equals(WHITE)) ? 1 : -1; dc != 0; dc = 0) {
-            for (int dr = -1; dr <= 1; dr += 1) {
-                if (dr == 0 && dc == 0) {
-                    continue;
-                }
-                if (checkJump(move(c, r, (char) ((int) c + dc),
-                        (char) ((int) r + dr), null), false)) {
-                    return true;
-                }
+        MoveList moveList = new MoveList();
+        getJumps(moveList, k);
+        for (Move move : moveList) {
+            if (checkJump(move, true)) {
+                return true;
             }
         }
         return false;
@@ -387,8 +395,7 @@ class Board extends Observable {
         }
         Board b = (Board) o;
         return _whoseMove.equals(b._whoseMove) && _gameOver == b._gameOver
-                && Arrays.equals(_board, b._board)
-                /*&& _moves.equals(b._moves)*/;
+                && Arrays.equals(_board, b._board);
     }
 
     @Override
@@ -399,14 +406,17 @@ class Board extends Observable {
     /** Return true iff there is a move for the current player. */
     private boolean isMove() {
         // FIXME
-        for (Move move : _moves) {
-            if (legalMove(move) && get(move.fromIndex()).equals(_whoseMove)) {
-                return true;
+        for (char c = 'a'; c <= 'e'; c++) {
+            for (char r = '1'; r <= '5'; r++) {
+                MoveList list = new MoveList();
+                getMoves(list);
+                if (list.size() > 0) {
+                    return true;
+                }
             }
         }
         return false;
     }
-
 
     /** Player that is on move. */
     private PieceColor _whoseMove;
@@ -464,4 +474,8 @@ class Board extends Observable {
 
     /** Stores the current list of moves. */
     private MoveList _moves;
+
+    /** represents the intial configuration of the board. */
+    private static final String INIT_BOARD =
+            "bbbbb bbbbb bb-ww wwwww wwwww";
 }

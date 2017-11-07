@@ -17,6 +17,7 @@ class Manual extends Player {
 
     @Override
     Move myMove() {
+        Command command = game().getMoveCmnd(_prompt);
         return null; // FIXME
     }
 

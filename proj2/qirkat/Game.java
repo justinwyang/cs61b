@@ -194,6 +194,7 @@ class Game {
         // FIXME
         Move mov = Move.parseMove(operands[0]);
         _board.makeMove(mov);
+        reportMove(operands[0]);
     }
 
     /** Perform the command 'clear'. */
