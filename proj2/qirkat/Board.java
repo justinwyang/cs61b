@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import static qirkat.PieceColor.*;
 import static qirkat.Move.*;
+import static qirkat.GameException.*;
 
 /** A Qirkat board.   The squares are labeled by column (a char value between
  *  'a' and 'e') and row (a char value between '1' and '5'.
@@ -244,7 +245,7 @@ class Board extends Observable {
             if (!validSquare(mov.toIndex()) || !get(mov.toIndex()).equals(EMPTY)) {
                 return allowPartial && began;
             }
-            if (!get(mov.toIndex()).equals(color.opposite())) {
+            if (!get(mov.jumpedIndex()).equals(color.opposite())) {
                 return false;
             }
             mov = mov.jumpTail();
@@ -313,15 +314,27 @@ class Board extends Observable {
             return;
         }
         if (mov.isJump()) {
-            if (checkJump(mov, true)) {
-                for (; mov != null; mov = mov.jumpTail()) {
-                    set(mov.col1(), mov.row1(), _whoseMove);
-                    set(mov.col0(), mov.row0(), EMPTY);
-                    set((char) ((mov.col0() + mov.col1()) / 2),
-                            (char) ((mov.row0() + mov.row1()) / 2), EMPTY);
-                }
+            if (!checkJump(mov, true)) {
+                throw error("That move is illegal.");
+            }
+            for (; mov != null; mov = mov.jumpTail()) {
+                set(mov.col1(), mov.row1(), _whoseMove);
+                set(mov.col0(), mov.row0(), EMPTY);
+                set((char) ((mov.col0() + mov.col1()) / 2),
+                        (char) ((mov.row0() + mov.row1()) / 2), EMPTY);
             }
         } else {
+            if (jumpPossible()) {
+                throw error("A jump is possible.");
+            }
+            if (_moves.size() >= 2) {
+                Move prev = _moves.get(_moves.size() - 2);
+                if ((mov.isLeftMove() && prev.isRightMove())
+                        && (mov.isRightMove() && prev.isLeftMove())
+                        && prev.fromIndex() == mov.toIndex()) {
+                    throw error("That move is illegal.");
+                }
+            }
             set(mov.col1(), mov.row1(), get(mov.col0(), mov.row0()));
             set(mov.col0(), mov.row0(), EMPTY);
         }
@@ -477,5 +490,5 @@ class Board extends Observable {
 
     /** represents the intial configuration of the board. */
     private static final String INIT_BOARD =
-            "bbbbb bbbbb bb-ww wwwww wwwww";
+            "wwwww wwwww bb-ww bbbbb bbbbb";
 }

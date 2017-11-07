@@ -128,7 +128,11 @@ class Game {
     void doAuto(String[] operands) {
         _state = SETUP;
         // FIXME
-
+        if (operands[0].toLowerCase().equals(WHITE.toString())) {
+            _whiteIsManual = false;
+        } else if (operands[0].toLowerCase().equals(BLACK.toString())) {
+            _blackIsManual = false;
+        }
     }
 
     /** Perform a 'help' command. */
@@ -202,6 +206,8 @@ class Game {
         // FIXME
         _board.clear();
         _state = State.SETUP;
+        _whiteIsManual = true;
+        _blackIsManual = false;
     }
 
     /** Perform the command 'set OPERANDS[0] OPERANDS[1]'. */

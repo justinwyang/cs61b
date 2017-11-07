@@ -17,8 +17,9 @@ class Manual extends Player {
 
     @Override
     Move myMove() {
+        // FIXME
         Command command = game().getMoveCmnd(_prompt);
-        return null; // FIXME
+        return Move.parseMove(command.operands()[0]);
     }
 
     /** Identifies the player serving as a source of input commands. */
