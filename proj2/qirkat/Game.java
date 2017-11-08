@@ -2,11 +2,7 @@ package qirkat;
 
 /* Author: P. N. Hilfinger */
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -48,10 +44,26 @@ class Game {
             }
 
             // FIXME
+            if (_whiteIsManual) {
+                white = new Manual(this, WHITE);
+            } else {
+                white = new AI(this, WHITE);
+            }
+            if (_blackIsManual) {
+                black = new Manual(this, BLACK);
+            } else {
+                black = new AI(this, BLACK);
+            }
 
             while (_state != SETUP && !_board.gameOver()) {
                 Move move;
-                move = null; // FIXME
+
+                // FIXME
+                if (_board.whoseMove().equals(WHITE)) {
+                    move = white.myMove();
+                } else {
+                    move = black.myMove();
+                }
 
                 if (_state == PLAYING) {
                     _board.makeMove(move);
@@ -164,6 +176,7 @@ class Game {
         try {
             FileReader reader = new FileReader(operands[0]);
             // FIXME
+            _inputs.addSource(new ReaderSource(reader, false));
         } catch (IOException e) {
             throw error("Cannot open file %s", operands[0]);
         }

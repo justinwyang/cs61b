@@ -1,5 +1,7 @@
 package qirkat;
 
+import java.util.ArrayList;
+
 import static qirkat.PieceColor.*;
 
 /** A Player that computes its own moves.
@@ -58,16 +60,50 @@ class AI extends Player {
         best = null;
 
         // FIXME
+        int staticScore = staticScore(board); // FIXME
+        if (depth == 0 || staticScore == 0) {
+            return staticScore;
+        }
+
+        int bestScore = (sense == 1) ? -INFTY : INFTY;
+
+        ArrayList<Move> moves = board.getMoves();
+        for (Move move : moves) {
+            board.makeMove(move);
+            int score = findMove(board, depth - 1, saveMove, -sense,
+                    alpha, beta);
+            if (sense == 1) {
+                if (score >= bestScore) {
+                    best = move;
+                    bestScore = score;
+                    alpha = Math.max(alpha, score);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+            } else {
+                if (score <= bestScore) {
+                    best = move;
+                    bestScore = score;
+                    beta = Math.min(beta, score);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+            }
+            board.undo();
+        }
 
         if (saveMove) {
             _lastFoundMove = best;
         }
 
-        return 0; // FIXME
+        return bestScore; // FIXME
     }
 
     /** Return a heuristic value for BOARD. */
     private int staticScore(Board board) {
-        return 0; // FIXME
+        // FIXME
+        return board.getMoves().size();
     }
 }

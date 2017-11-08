@@ -183,29 +183,10 @@ class Board extends Observable {
      *  with linearized index K to MOVES. */
     private void getMoves(ArrayList<Move> moves, int k) {
         // FIXME
-        for (Move move : generateMoves(k, 1)) {
-            moves.add(move);
+        if (!get(k).equals(whoseMove())) {
+            return;
         }
-    }
 
-    /** Add all legal captures from the position with linearized index K
-     *  to MOVES. */
-    private void getJumps(ArrayList<Move> moves, int k) {
-        // FIXME
-        for (Move move : generateMoves(k, 2)) {
-            if (checkJump(move, true)) {
-                moves.add(move);
-            }
-        }
-    }
-
-    /** Generates a list of possible moves.
-     *
-     * @param k the index
-     * @param len the length of jump
-     * @return a list of moves
-     */
-    private MoveList generateMoves(int k, int len) {
         int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
         int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
 
@@ -217,36 +198,165 @@ class Board extends Observable {
             type = 8;
         }
 
-        MoveList list = new MoveList();
+        for (int i = 0; i < type; i++) {
+            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
+                continue;
+            }
+            char nc = (char) ((int) c + dc[i]), nr = (char) ((int) r + dr[i]);
+            if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
+                Move mov = Move.move(c, r, nc, nr);
+                if (legalNonCapture(mov)) {
+                    moves.add(Move.move(c, r, nc, nr));
+                }
+            }
+        }
+    }
+
+    /** Checks whether a move backtracks to a previous slot or not.
+     *
+     * @param mov the move in question
+     * @return if legal or not
+     */
+    private boolean legalNonCapture(Move mov) {
+        if (_moves.size() < 2) {
+            return true;
+        }
+        if (!get(mov.fromIndex()).equals(whoseMove()) || !get(mov.toIndex()).equals(EMPTY)) {
+            return false;
+        }
+        Move prev = _moves.get(_moves.size() - 2);
+        if (((mov.isLeftMove() && prev.isRightMove())
+                || (mov.isRightMove() && prev.isLeftMove()))
+                && prev.fromIndex() == mov.toIndex()) {
+            return false;
+        }
+        return true;
+    }
+
+    /** Add all legal captures from the position with linearized index K
+     *  to MOVES. */
+    private void getJumps(ArrayList<Move> moves, int k) {
+        // FIXME
+        if (!get(k).equals(whoseMove())) {
+            return;
+        }
+        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
+        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
+
+        char c = Move.col(k), r = Move.row(k);
+        int type;
+        if ((c - 'a') % 2 == (r - '1') % 2) {
+            type = 4;
+        } else {
+            type = 8;
+        }
 
         for (int i = 0; i < type; i++) {
             if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
                 continue;
             }
-            char nc = (char) ((int) c + len * dc[i]), nr = (char) ((int) r + len * dr[i]);
+            char nc = (char) ((int) c + 2 * dc[i]), nr = (char) ((int) r + 2 * dr[i]);
             if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
-                list.add(Move.move(c, r, nc, nr));
+                Move mov = Move.move(c, r, nc, nr);
+                if (!checkJump(mov, true)) {
+                    continue;
+                }
+
+//                Board nBoard = new Board(this);
+//                nBoard.makeMove(mov);
+//                nBoard._whoseMove = whoseMove();
+
+                set(mov.toIndex(), whoseMove());
+                set(mov.fromIndex(), EMPTY);
+                set(mov.jumpedIndex(), EMPTY);
+
+                ArrayList<Move> nextMoves = new ArrayList<>();
+                getJumps(nextMoves, mov.toIndex());
+                if (nextMoves.size() == 0) {
+                    for (Move nextMov : nextMoves) {
+                        moves.add(Move.move(mov, nextMov));
+                    }
+                } else {
+                    moves.add(mov);
+                }
+
+                set(mov.fromIndex(), get(mov.toIndex()));
+                set(mov.jumpedIndex(), get(mov.toIndex()).opposite());
+                set(mov.toIndex(), EMPTY);
+
             }
         }
-        return list;
     }
+
+//    @Deprecated
+//    /** Helper: Generates jumps from an index k, called recursively.
+//     *
+//     * @param k The starting index
+//     * @return The list of jumps
+//     */
+//    private ArrayList<Move> generateJumps(int k, boolean first) {
+//        ArrayList<Move> jumps = generateMoves(k, 2);
+//        for (Move mov: generateMoves(k, 2)) {
+//            if (first && !get(mov.fromIndex()).equals(whoseMove())) {
+//                continue;
+//            }
+//            if (get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
+//                for (Move nextMov: generateJumps(mov.toIndex(), false)) {
+//                    jumps.add(Move.move(mov, nextMov));
+//                }
+//            }
+//        }
+//        return jumps;
+//    }
+//
+//    @Deprecated
+//    /** Generates a list of possible moves.
+//     *
+//     * @param k the index
+//     * @param len the length of jump
+//     * @return a list of moves
+//     */
+//    private ArrayList<Move> generateMoves(int k, int len) {
+//        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
+//        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
+//
+//        char c = Move.col(k), r = Move.row(k);
+//        int type;
+//        if ((c - 'a') % 2 == (r - '1') % 2) {
+//            type = 4;
+//        } else {
+//            type = 8;
+//        }
+//
+//        ArrayList<Move> list = new ArrayList<Move>();
+//
+//        for (int i = 0; i < type; i++) {
+//            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
+//                continue;
+//            }
+//            char nc = (char) ((int) c + len * dc[i]), nr = (char) ((int) r + len * dr[i]);
+//            if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
+//                list.add(Move.move(c, r, nc, nr));
+//            }
+//        }
+//        return list;
+//    }
 
     /** Return true iff MOV is a valid jump sequence on the current board.
      *  MOV must be a jump or null.  If ALLOWPARTIAL, allow jumps that
      *  could be continued and are valid as far as they go.  */
     boolean checkJump(Move mov, boolean allowPartial) {
         // FIXME
-        if (!validSquare(mov.fromIndex()) || get(mov.fromIndex()).equals(EMPTY)) {
+        if (!validSquare(mov.fromIndex()) || get(mov.fromIndex()).equals(EMPTY) ||
+                !get(mov.fromIndex()).equals(whoseMove())) {
             return false;
         }
         PieceColor color = get(mov.fromIndex());
         boolean began = false;
         while (mov != null) {
-            if (!validSquare(mov.toIndex()) || !get(mov.toIndex()).equals(EMPTY)) {
+            if (!validSquare(mov.toIndex()) || !get(mov.toIndex()).equals(EMPTY)
+                    || !get(mov.jumpedIndex()).equals(color.opposite())) {
                 return allowPartial && began;
-            }
-            if (!get(mov.jumpedIndex()).equals(color.opposite())) {
-                return false;
             }
             mov = mov.jumpTail();
             began = true;
@@ -318,25 +428,19 @@ class Board extends Observable {
                 throw error("That move is illegal.");
             }
             for (; mov != null; mov = mov.jumpTail()) {
-                set(mov.col1(), mov.row1(), _whoseMove);
-                set(mov.col0(), mov.row0(), EMPTY);
-                set((char) ((mov.col0() + mov.col1()) / 2),
-                        (char) ((mov.row0() + mov.row1()) / 2), EMPTY);
+                set(mov.toIndex(), whoseMove());
+                set(mov.fromIndex(), EMPTY);
+                set(mov.jumpedIndex(), EMPTY);
             }
         } else {
             if (jumpPossible()) {
                 throw error("A jump is possible.");
             }
-            if (_moves.size() >= 2) {
-                Move prev = _moves.get(_moves.size() - 2);
-                if ((mov.isLeftMove() && prev.isRightMove())
-                        && (mov.isRightMove() && prev.isLeftMove())
-                        && prev.fromIndex() == mov.toIndex()) {
-                    throw error("That move is illegal.");
-                }
+            if (!legalNonCapture(mov)) {
+                throw error("That move is illegal.");
             }
-            set(mov.col1(), mov.row1(), get(mov.col0(), mov.row0()));
-            set(mov.col0(), mov.row0(), EMPTY);
+            set(mov.toIndex(), whoseMove());
+            set(mov.fromIndex(), EMPTY);
         }
         _whoseMove = _whoseMove.opposite();
 
@@ -349,25 +453,24 @@ class Board extends Observable {
         // FIXME
         if (_moves.size() != 0) {
             Move mov = _moves.remove(_moves.size() - 1);
-            PieceColor mover = _whoseMove.opposite();
             if (mov.isJump()) {
                 MoveList list = new MoveList();
                 for (; mov != null; mov = mov.jumpTail()) {
                     list.add(mov);
                 }
+                PieceColor color = get(list.get(list.size() - 1).toIndex());
                 for (int i = list.size() - 1; i >= 0; i--) {
                     Move curMov = list.get(i);
-                    set(curMov.col0(), curMov.row0(), mover);
-                    set(curMov.col1(), curMov.row1(), EMPTY);
-                    set((char) ((curMov.col0() + curMov.col1()) / 2),
-                            (char) ((curMov.row0() + curMov.row1()) / 2),
-                            _whoseMove);
+                    set(curMov.fromIndex(), color);
+                    set(curMov.toIndex(), EMPTY);
+                    set(curMov.jumpedIndex(), color.opposite());
                 }
             } else {
-                set(mov.col0(), mov.row0(), mover);
-                set(mov.col1(), mov.row1(), EMPTY);
+                set(mov.fromIndex(), get(mov.toIndex()));
+                set(mov.toIndex(), EMPTY);
             }
             _whoseMove = _whoseMove.opposite();
+            _gameOver = false;
         }
 
         setChanged();
@@ -429,6 +532,21 @@ class Board extends Observable {
             }
         }
         return false;
+    }
+
+    /** Returns if there is only a single color in the board. */
+    private boolean singleColor() {
+        int numWhite = 0, numBlack = 0;
+        for (char c = 'a'; c <= 'e'; c++) {
+            for (char r = '1'; r <= '5'; r++) {
+                if (get(c, r).equals(WHITE)) {
+                    numWhite++;
+                } else if (get(c, r).equals(BLACK)) {
+                    numBlack++;
+                }
+            }
+        }
+        return numWhite == 0 || numBlack == 0;
     }
 
     /** Player that is on move. */

@@ -38,7 +38,6 @@ public class BoardTest {
         Board b0 = new Board();
         makeMoves(b0, GAME1);
         assertEquals(GAME1_BOARD, b0.toString());
-
     }
 
     @Test
