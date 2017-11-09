@@ -66,8 +66,13 @@ class AI extends Player {
         int bestScore = (sense == 1) ? -INFTY : INFTY;
 
         ArrayList<Move> moves = board.getMoves();
-        for (Move mov : moves) {
-            board.makeMove(mov);
+
+        for (Move mov: moves) {
+            try {
+                board.makeMove(mov);
+            } catch (GameException excp) {
+                continue;
+            }
             int score = findMove(board, depth - 1, saveMove, -sense,
                     alpha, beta);
             if (sense == 1) {
