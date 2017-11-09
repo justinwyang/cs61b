@@ -106,6 +106,7 @@ class Board extends Observable {
             }
         }
 
+        this._moves = new MoveList();
         this._whoseMove = nextMove;
         this._gameOver = !isMove();
 
@@ -255,19 +256,25 @@ class Board extends Observable {
             return false;
         }
         for (int i = _moves.size() - 1; i >= 0; i--) {
-            Move prev = _moves.get(i);
-            if (prev.isJump()) {
-                break;
-            }
             if ((_moves.size() - i) % 2 != 0) {
                 continue;
             }
-            if (prev.fromIndex() == mov.toIndex()
-                    && prev.toIndex() == mov.fromIndex()) {
-                return false;
+            Move prev = _moves.get(i);
+            if (prev.isJump()) {
+                while (prev.jumpTail() != null) {
+                    prev = prev.jumpTail();
+                }
+            }
+            if (prev.toIndex() == mov.fromIndex()) {
+                if (prev.isJump()) {
+                    return true;
+                }
+                if (prev.fromIndex() == mov.toIndex()) {
+                    return false;
+                }
+                return true;
             }
         }
-
         return true;
     }
 
