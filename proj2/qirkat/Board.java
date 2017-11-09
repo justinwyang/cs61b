@@ -240,22 +240,34 @@ class Board extends Observable {
      * @return if legal or not
      */
     public boolean legalNonCapture(Move mov) {
-        if (!checkRowMove(mov)) {
-            return false;
-        }
-        if (_moves.size() < 2) {
-            return true;
-        }
         if (!get(mov.fromIndex()).equals(whoseMove())
                 || !get(mov.toIndex()).equals(EMPTY)) {
             return false;
         }
-        Move prev = _moves.get(_moves.size() - 2);
-        if (((mov.isLeftMove() && prev.isRightMove())
-                || (mov.isRightMove() && prev.isLeftMove()))
-                && prev.fromIndex() == mov.toIndex()) {
+        if (!checkRowMove(mov)) {
             return false;
         }
+        if (!mov.isLeftMove() && !mov.isRightMove()) {
+            return true;
+        }
+        if ((whoseMove().equals(WHITE) && mov.row0() == '5')
+                || (whoseMove().equals(BLACK) && mov.row0() == '1')) {
+            return false;
+        }
+        for (int i = _moves.size() - 1; i >= 0; i--) {
+            Move prev = _moves.get(i);
+            if (prev.isJump()) {
+                break;
+            }
+            if ((_moves.size() - i) % 2 != 0) {
+                continue;
+            }
+            if (prev.fromIndex() == mov.toIndex()
+                    && prev.toIndex() == mov.fromIndex()) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -380,6 +392,7 @@ class Board extends Observable {
     /** Make the Move MOV on this Board, assuming it is legal. */
     void makeMove(Move mov) {
         assert legalMove(mov);
+        Move origMov = mov;
 
         if (get(mov.fromIndex()).equals(PieceColor.EMPTY)) {
             throw error("You must move a valid piece.");
@@ -388,7 +401,6 @@ class Board extends Observable {
             throw error("You may only move your own pieces.");
         }
 
-        _moves.add(mov);
         if (mov.isVestigial()) {
             _whoseMove = _whoseMove.opposite();
             return;
@@ -412,6 +424,8 @@ class Board extends Observable {
             set(mov.toIndex(), whoseMove());
             set(mov.fromIndex(), EMPTY);
         }
+
+        _moves.add(origMov);
         _whoseMove = _whoseMove.opposite();
         checkGameOver();
 
