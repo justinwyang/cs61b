@@ -45,7 +45,6 @@ class Board extends Observable {
         _whoseMove = WHITE;
         _gameOver = false;
 
-        // FIXME
         _board = new PieceColor[Move.SIDE * Move.SIDE];
         _moves = new MoveList();
         setPieces(INIT_BOARD, WHITE);
@@ -61,7 +60,6 @@ class Board extends Observable {
 
     /** Copy B into me. */
     private void internalCopy(Board b) {
-        // FIXME
         this._gameOver = b._gameOver;
         this._whoseMove = b._whoseMove;
         _board = new PieceColor[Move.SIDE * Move.SIDE];
@@ -92,8 +90,6 @@ class Board extends Observable {
             throw new IllegalArgumentException("bad board description");
         }
 
-        // FIXME
-
         for (int k = 0; k < str.length(); k += 1) {
             switch (str.charAt(k)) {
             case '-':
@@ -110,7 +106,6 @@ class Board extends Observable {
             }
         }
 
-        // FIXME
         this._whoseMove = nextMove;
         this._gameOver = !isMove();
 
@@ -182,7 +177,6 @@ class Board extends Observable {
     /** Add all legal non-capturing moves from the position
      *  with linearized index K to MOVES. */
     private void getMoves(ArrayList<Move> moves, int k) {
-        // FIXME
         if (!get(k).equals(whoseMove())) {
             return;
         }
@@ -193,13 +187,14 @@ class Board extends Observable {
         char c = Move.col(k), r = Move.row(k);
         int type;
         if ((c - 'a') % 2 == (r - '1') % 2) {
-            type = 4;
-        } else {
             type = 8;
+        } else {
+            type = 4;
         }
 
         for (int i = 0; i < type; i++) {
-            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
+            if ((whoseMove().equals(WHITE) && dr[i] < 0)
+                    || (whoseMove().equals(BLACK) && dr[i] > 0)) {
                 continue;
             }
             char nc = (char) ((int) c + dc[i]), nr = (char) ((int) r + dr[i]);
@@ -212,16 +207,34 @@ class Board extends Observable {
         }
     }
 
+    /** Checks if the mov goes backwards along the row.
+     *
+     * @param mov the move
+     * @return whether or not it satisfies row condition.
+     */
+    private boolean checkRowMove(Move mov) {
+        int dr = mov.row1() - mov.row0();
+        if ((whoseMove().equals(WHITE) && dr == -1)
+                || (whoseMove().equals(BLACK) && dr == 1)) {
+            return false;
+        }
+        return true;
+    }
+
     /** Checks whether a move backtracks to a previous slot or not.
      *
      * @param mov the move in question
      * @return if legal or not
      */
     private boolean legalNonCapture(Move mov) {
+        if (!checkRowMove(mov)) {
+            return false;
+        }
         if (_moves.size() < 2) {
             return true;
         }
-        if (!get(mov.fromIndex()).equals(whoseMove()) || !get(mov.toIndex()).equals(EMPTY)) {
+        if (!get(mov.fromIndex()).equals(whoseMove())
+                || !get(mov.toIndex()).equals(EMPTY)) {
             return false;
         }
         Move prev = _moves.get(_moves.size() - 2);
@@ -236,43 +249,38 @@ class Board extends Observable {
     /** Add all legal captures from the position with linearized index K
      *  to MOVES. */
     private void getJumps(ArrayList<Move> moves, int k) {
-        // FIXME
-        if (!get(k).equals(whoseMove())) {
-            return;
-        }
         int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
         int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
 
         char c = Move.col(k), r = Move.row(k);
         int type;
         if ((c - 'a') % 2 == (r - '1') % 2) {
-            type = 4;
-        } else {
             type = 8;
+        } else {
+            type = 4;
         }
 
         for (int i = 0; i < type; i++) {
-            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
+            if ((whoseMove().equals(WHITE) && dr[i] < 0)
+                    || (whoseMove().equals(BLACK) && dr[i] > 0)) {
                 continue;
             }
-            char nc = (char) ((int) c + 2 * dc[i]), nr = (char) ((int) r + 2 * dr[i]);
-            if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
-                Move mov = Move.move(c, r, nc, nr);
-                if (!checkJump(mov, true)) {
-                    continue;
-                }
+            char nc = (char) ((int) c + 2 * dc[i]),
+                    nr = (char) ((int) r + 2 * dr[i]);
 
-//                Board nBoard = new Board(this);
-//                nBoard.makeMove(mov);
-//                nBoard._whoseMove = whoseMove();
+            if (!validSquare(nc, nr)) {
+                continue;
+            }
 
+            Move mov = Move.move(c, r, nc, nr);
+            if (checkJump(mov, true)) {
                 set(mov.toIndex(), whoseMove());
                 set(mov.fromIndex(), EMPTY);
                 set(mov.jumpedIndex(), EMPTY);
 
                 ArrayList<Move> nextMoves = new ArrayList<>();
                 getJumps(nextMoves, mov.toIndex());
-                if (nextMoves.size() == 0) {
+                if (nextMoves.size() != 0) {
                     for (Move nextMov : nextMoves) {
                         moves.add(Move.move(mov, nextMov));
                     }
@@ -281,81 +289,31 @@ class Board extends Observable {
                 }
 
                 set(mov.fromIndex(), get(mov.toIndex()));
-                set(mov.jumpedIndex(), get(mov.toIndex()).opposite());
+                set(mov.jumpedIndex(), whoseMove().opposite());
                 set(mov.toIndex(), EMPTY);
-
             }
         }
     }
-
-//    @Deprecated
-//    /** Helper: Generates jumps from an index k, called recursively.
-//     *
-//     * @param k The starting index
-//     * @return The list of jumps
-//     */
-//    private ArrayList<Move> generateJumps(int k, boolean first) {
-//        ArrayList<Move> jumps = generateMoves(k, 2);
-//        for (Move mov: generateMoves(k, 2)) {
-//            if (first && !get(mov.fromIndex()).equals(whoseMove())) {
-//                continue;
-//            }
-//            if (get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
-//                for (Move nextMov: generateJumps(mov.toIndex(), false)) {
-//                    jumps.add(Move.move(mov, nextMov));
-//                }
-//            }
-//        }
-//        return jumps;
-//    }
-//
-//    @Deprecated
-//    /** Generates a list of possible moves.
-//     *
-//     * @param k the index
-//     * @param len the length of jump
-//     * @return a list of moves
-//     */
-//    private ArrayList<Move> generateMoves(int k, int len) {
-//        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
-//        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
-//
-//        char c = Move.col(k), r = Move.row(k);
-//        int type;
-//        if ((c - 'a') % 2 == (r - '1') % 2) {
-//            type = 4;
-//        } else {
-//            type = 8;
-//        }
-//
-//        ArrayList<Move> list = new ArrayList<Move>();
-//
-//        for (int i = 0; i < type; i++) {
-//            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
-//                continue;
-//            }
-//            char nc = (char) ((int) c + len * dc[i]), nr = (char) ((int) r + len * dr[i]);
-//            if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
-//                list.add(Move.move(c, r, nc, nr));
-//            }
-//        }
-//        return list;
-//    }
 
     /** Return true iff MOV is a valid jump sequence on the current board.
      *  MOV must be a jump or null.  If ALLOWPARTIAL, allow jumps that
      *  could be continued and are valid as far as they go.  */
     boolean checkJump(Move mov, boolean allowPartial) {
-        // FIXME
-        if (!validSquare(mov.fromIndex()) || get(mov.fromIndex()).equals(EMPTY) ||
-                !get(mov.fromIndex()).equals(whoseMove())) {
+        if (!checkRowMove(mov)) {
             return false;
         }
-        PieceColor color = get(mov.fromIndex());
+        if (!validSquare(mov.fromIndex())
+                || !get(mov.fromIndex()).equals(whoseMove())
+                || !validSquare(mov.toIndex())
+                || !get(mov.toIndex()).equals(EMPTY)
+                || !get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
+            return false;
+        }
+
         boolean began = false;
         while (mov != null) {
             if (!validSquare(mov.toIndex()) || !get(mov.toIndex()).equals(EMPTY)
-                    || !get(mov.jumpedIndex()).equals(color.opposite())) {
+                    || !get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
                 return allowPartial && began;
             }
             mov = mov.jumpTail();
@@ -372,18 +330,12 @@ class Board extends Observable {
     /** Return true iff a jump is possible for a piece at position with
      *  linearized index K. */
     boolean jumpPossible(int k) {
-        // FIXME
         if (!get(k).equals(whoseMove())) {
             return false;
         }
         MoveList moveList = new MoveList();
         getJumps(moveList, k);
-        for (Move move : moveList) {
-            if (checkJump(move, true)) {
-                return true;
-            }
-        }
-        return false;
+        return moveList.size() > 0;
     }
 
     /** Return true iff a jump is possible from the current board. */
@@ -418,7 +370,9 @@ class Board extends Observable {
     void makeMove(Move mov) {
         assert legalMove(mov);
 
-        // FIXME
+        if (gameOver()) {
+            throw error("The game is over!");
+        }
         _moves.add(mov);
         if (mov.isVestigial()) {
             return;
@@ -443,6 +397,7 @@ class Board extends Observable {
             set(mov.fromIndex(), EMPTY);
         }
         _whoseMove = _whoseMove.opposite();
+        checkGameOver();
 
         setChanged();
         notifyObservers();
@@ -450,7 +405,6 @@ class Board extends Observable {
 
     /** Undo the last move, if any. */
     void undo() {
-        // FIXME
         if (_moves.size() != 0) {
             Move mov = _moves.remove(_moves.size() - 1);
             if (mov.isJump()) {
@@ -486,7 +440,6 @@ class Board extends Observable {
      *  column numbers around the edges. */
     String toString(boolean legend) {
         Formatter out = new Formatter();
-        // FIXME
         String s = "";
         for (char r  = '5'; r >= '1'; r--) {
             s += " ";
@@ -519,9 +472,31 @@ class Board extends Observable {
         return super.hashCode();
     }
 
+    /** Checks is game over, using isMove() and singleColor(). */
+    private void checkGameOver() {
+        _gameOver = (!isMove() || singleColor() != null);
+    }
+
+    /** Finds the winner to the game.
+     *
+     * @return the winner.
+     */
+    public PieceColor winner() {
+        if (!gameOver()) {
+            return null;
+        }
+        if (!isMove()) {
+            return whoseMove();
+        }
+        PieceColor winner = singleColor();
+        if (winner != null) {
+            return winner;
+        }
+        return null;
+    }
+
     /** Return true iff there is a move for the current player. */
     private boolean isMove() {
-        // FIXME
         for (char c = 'a'; c <= 'e'; c++) {
             for (char r = '1'; r <= '5'; r++) {
                 MoveList list = new MoveList();
@@ -534,8 +509,11 @@ class Board extends Observable {
         return false;
     }
 
-    /** Returns if there is only a single color in the board. */
-    private boolean singleColor() {
+    /** Finds if there is only a single color in the board.
+     *
+     * @return the single color, if it exists, otherwise null.
+     */
+    private PieceColor singleColor() {
         int numWhite = 0, numBlack = 0;
         for (char c = 'a'; c <= 'e'; c++) {
             for (char r = '1'; r <= '5'; r++) {
@@ -546,7 +524,12 @@ class Board extends Observable {
                 }
             }
         }
-        return numWhite == 0 || numBlack == 0;
+        if (numBlack == 0) {
+            return PieceColor.WHITE;
+        } else if (numWhite == 0) {
+            return PieceColor.BLACK;
+        }
+        return null;
     }
 
     /** Player that is on move. */

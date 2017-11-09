@@ -145,8 +145,7 @@ public class RedBlackTree<T extends Comparable<T>> {
 
         // Insert (return) new red leaf node.
         if (node == null) {
-            return new RBTreeNode<T>(false, item,
-                    null, null);
+            return new RBTreeNode<T>(false, item);
         }
 
         // Handle normal binary search tree insertion.

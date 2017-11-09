@@ -79,13 +79,10 @@ public class MoreBoardTests {
     public void testGetJumps() {
         Board b0 = new Board();
         b0.setPieces("----- -wb-- ---b- ----- -----", PieceColor.WHITE);
-//        System.out.println(b0.jumpPossible());
-        assertTrue(b0.jumpPossible());
-        b0.makeMove(Move.move('b', '2', 'a', '2'));
-        for (Move mov: b0.getMoves()) {
-            System.out.println(mov);
-        }
+        assertEquals(b0.getMoves().get(0), Move.parseMove("b2-d2-d4"));
 
         String fourJumps = "----- ----- --wb- -b-bb -----";
+        b0.setPieces(fourJumps, PieceColor.WHITE);
+        assertEquals(b0.getMoves().size(), 4);
     }
 }

@@ -9,6 +9,7 @@ import java.io.PipedWriter;
  *  @author P. N. Hilfinger */
 public class Main {
 
+    /* NOTE:::::: Remove the 2 lines for GUI. */
     /** Run Qirkat game.  Use display if ARGS[k] is '--display', timing
      *  if ARGS[k] is "--timing". */
     public static void main(String[] args) {
@@ -36,8 +37,6 @@ public class Main {
         game = null;
         if (useGUI) {
             try {
-                // Remove this comment.  Also remove the next two lines if
-                // you do the extra credit.
                 System.err.printf("Sorry, --display not implemented.%n");
                 System.exit(2);
 

@@ -28,7 +28,6 @@ class AI extends Player {
         Move move = findMove();
         Main.endTiming();
 
-        // FIXME
         return move;
     }
 
@@ -59,8 +58,7 @@ class AI extends Player {
         Move best;
         best = null;
 
-        // FIXME
-        int staticScore = staticScore(board); // FIXME
+        int staticScore = staticScore(board);
         if (depth == 0 || staticScore == 0) {
             return staticScore;
         }
@@ -98,12 +96,11 @@ class AI extends Player {
             _lastFoundMove = best;
         }
 
-        return bestScore; // FIXME
+        return bestScore;
     }
 
     /** Return a heuristic value for BOARD. */
     private int staticScore(Board board) {
-        // FIXME
         return board.getMoves().size();
     }
 }

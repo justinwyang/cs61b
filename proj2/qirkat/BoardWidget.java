@@ -59,11 +59,12 @@ class BoardWidget extends Pad implements Observer {
         repaint();
     }
 
+    /* FIX(add after, changed for style) */
     @Override
     public synchronized void paintComponent(Graphics2D g) {
         g.setColor(BLANK_COLOR);
         g.fillRect(0, 0, _dim, _dim);
-        // FIXME
+
     }
 
     /** Notify observers of mouse's current position from click event WHERE. */
@@ -86,7 +87,7 @@ class BoardWidget extends Pad implements Observer {
         repaint();
     }
 
-    // FILL IN
+    /* FILL IN */
 
 
     /** Dimension of current drawing surface in pixels. */
