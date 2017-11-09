@@ -66,6 +66,10 @@ class Game {
                     move = black.myMove();
                 }
 
+                if (move == null) {
+                    continue;
+                }
+
                 try {
                     if (_state == PLAYING) {
                         _board.makeMove(move);

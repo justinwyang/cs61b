@@ -506,7 +506,7 @@ class Board extends Observable {
             return null;
         }
         if (!isMove()) {
-            return whoseMove();
+            return whoseMove().opposite();
         }
         PieceColor winner = singleColor();
         if (winner != null) {

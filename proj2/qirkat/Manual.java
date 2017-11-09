@@ -18,7 +18,10 @@ class Manual extends Player {
     @Override
     Move myMove() {
         Command command = game().getMoveCmnd(_prompt);
-        return Move.parseMove(command.operands()[0]);
+        if (command != null && command.commandType().equals(PIECEMOVE)) {
+            return Move.parseMove(command.operands()[0]);
+        }
+        return null;
     }
 
     /** Identifies the player serving as a source of input commands. */
