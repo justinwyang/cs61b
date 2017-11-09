@@ -148,7 +148,7 @@ class Board extends Observable {
     /** Checks whether the piece is moving forward.
      *
      * @param dr the vertical direction
-     * @return whether the direciton is valid or not
+     * @return whether the direction is valid or not
      */
     boolean checkDirection(int dr) {
         return (whoseMove().equals(WHITE) && dr >= 0)
@@ -239,7 +239,7 @@ class Board extends Observable {
      * @param mov the move in question
      * @return if legal or not
      */
-    private boolean legalNonCapture(Move mov) {
+    public boolean legalNonCapture(Move mov) {
         if (!checkRowMove(mov)) {
             return false;
         }
@@ -278,9 +278,6 @@ class Board extends Observable {
         }
 
         for (int i = 0; i < type; i++) {
-            if (!checkDirection(dr[i])) {
-                continue;
-            }
             char nc = (char) ((int) c + 2 * dc[i]),
                     nr = (char) ((int) r + 2 * dr[i]);
 
@@ -315,11 +312,7 @@ class Board extends Observable {
      *  MOV must be a jump or null.  If ALLOWPARTIAL, allow jumps that
      *  could be continued and are valid as far as they go.  */
     boolean checkJump(Move mov, boolean allowPartial) {
-        if (!checkRowMove(mov)) {
-            return false;
-        }
-        if (!checkRowMove(mov)
-                || !validSquare(mov.fromIndex())
+        if (!validSquare(mov.fromIndex())
                 || !get(mov.fromIndex()).equals(whoseMove())
                 || !validSquare(mov.toIndex())
                 || !get(mov.toIndex()).equals(EMPTY)
@@ -329,7 +322,7 @@ class Board extends Observable {
 
         boolean began = false;
         while (mov != null) {
-            if (!checkRowMove(mov) || !validSquare(mov.toIndex())
+            if (!validSquare(mov.toIndex())
                     || !get(mov.toIndex()).equals(EMPTY)
                     || !get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
                 return allowPartial && began;
@@ -388,17 +381,11 @@ class Board extends Observable {
     void makeMove(Move mov) {
         assert legalMove(mov);
 
-        if (gameOver()) {
-            throw error("The game is over!");
-        }
         if (get(mov.fromIndex()).equals(PieceColor.EMPTY)) {
             throw error("You must move a valid piece.");
         }
         if (!get(mov.fromIndex()).equals(whoseMove())) {
             throw error("You may only move your own pieces.");
-        }
-        if (!checkDirection(mov.row1() - mov.row0())) {
-            throw error("You may not move backwards.");
         }
 
         _moves.add(mov);
@@ -416,8 +403,8 @@ class Board extends Observable {
                 set(mov.jumpedIndex(), EMPTY);
             }
         } else {
-            if (jumpPossible()) {
-                throw error("A jump is possible.");
+            if (!checkDirection(mov.row1() - mov.row0())) {
+                throw error("You may not move backwards.");
             }
             if (!legalNonCapture(mov)) {
                 throw error("That move is illegal.");
