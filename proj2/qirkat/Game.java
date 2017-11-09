@@ -144,9 +144,11 @@ class Game {
     /** Perform the command 'auto OPERANDS[0]'. */
     void doAuto(String[] operands) {
         _state = SETUP;
-        if (operands[0].toLowerCase().equals(WHITE.toString())) {
+        if (operands[0].toLowerCase().equals
+                (WHITE.toString().toLowerCase())) {
             _whiteIsManual = false;
-        } else if (operands[0].toLowerCase().equals(BLACK.toString())) {
+        } else if (operands[0].toLowerCase().equals
+                (BLACK.toString().toLowerCase())) {
             _blackIsManual = false;
         }
     }
@@ -188,12 +190,12 @@ class Game {
     /** Perform the command 'manual OPERANDS[0]'. */
     void doManual(String[] operands) {
         _state = SETUP;
-        if (operands[0].toLowerCase().equals(WHITE.toString())) {
+        if (operands[0].toLowerCase().equals
+                (WHITE.toString().toLowerCase())) {
             _whiteIsManual = true;
-        } else if (operands[0].toLowerCase().equals(BLACK.toString())) {
+        } else if (operands[0].toLowerCase().equals
+                (BLACK.toString().toLowerCase())) {
             _blackIsManual = true;
-        } else {
-            throw error("");
         }
     }
 
