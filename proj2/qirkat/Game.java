@@ -66,8 +66,12 @@ class Game {
                     move = black.myMove();
                 }
 
-                if (_state == PLAYING) {
-                    _board.makeMove(move);
+                try {
+                    if (_state == PLAYING) {
+                        _board.makeMove(move);
+                    }
+                } catch (GameException excp) {
+                    _reporter.errMsg(excp.getMessage());
                 }
             }
 

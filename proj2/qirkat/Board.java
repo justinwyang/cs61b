@@ -145,6 +145,16 @@ class Board extends Observable {
         _board[k] = v;
     }
 
+    /** Checks whether the piece is moving forward.
+     *
+     * @param dr the vertical direction
+     * @return whether the direciton is valid or not
+     */
+    boolean checkDirection(int dr) {
+        return (whoseMove().equals(WHITE) && dr >= 0)
+                || (whoseMove().equals(BLACK) && dr <= 0);
+    }
+
     /** Return true iff MOV is legal on the current board. */
     boolean legalMove(Move mov) {
         return mov.validSquare(mov.fromIndex())
@@ -192,9 +202,12 @@ class Board extends Observable {
             type = 4;
         }
 
+        if (!get(k).equals(whoseMove())) {
+            return;
+        }
+
         for (int i = 0; i < type; i++) {
-            if ((whoseMove().equals(WHITE) && dr[i] < 0)
-                    || (whoseMove().equals(BLACK) && dr[i] > 0)) {
+            if (!checkDirection(dr[i])) {
                 continue;
             }
             char nc = (char) ((int) c + dc[i]), nr = (char) ((int) r + dr[i]);
@@ -252,6 +265,10 @@ class Board extends Observable {
         int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
         int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
 
+        if (!get(k).equals(whoseMove())) {
+            return;
+        }
+
         char c = Move.col(k), r = Move.row(k);
         int type;
         if ((c - 'a') % 2 == (r - '1') % 2) {
@@ -261,8 +278,7 @@ class Board extends Observable {
         }
 
         for (int i = 0; i < type; i++) {
-            if ((whoseMove().equals(WHITE) && dr[i] < 0)
-                    || (whoseMove().equals(BLACK) && dr[i] > 0)) {
+            if (!checkDirection(dr[i])) {
                 continue;
             }
             char nc = (char) ((int) c + 2 * dc[i]),
@@ -273,7 +289,7 @@ class Board extends Observable {
             }
 
             Move mov = Move.move(c, r, nc, nr);
-            if (checkJump(mov, true)) {
+            if (checkJump(mov, false)) {
                 set(mov.toIndex(), whoseMove());
                 set(mov.fromIndex(), EMPTY);
                 set(mov.jumpedIndex(), EMPTY);
@@ -302,7 +318,8 @@ class Board extends Observable {
         if (!checkRowMove(mov)) {
             return false;
         }
-        if (!validSquare(mov.fromIndex())
+        if (!checkRowMove(mov)
+                || !validSquare(mov.fromIndex())
                 || !get(mov.fromIndex()).equals(whoseMove())
                 || !validSquare(mov.toIndex())
                 || !get(mov.toIndex()).equals(EMPTY)
@@ -312,7 +329,8 @@ class Board extends Observable {
 
         boolean began = false;
         while (mov != null) {
-            if (!validSquare(mov.toIndex()) || !get(mov.toIndex()).equals(EMPTY)
+            if (!checkRowMove(mov) || !validSquare(mov.toIndex())
+                    || !get(mov.toIndex()).equals(EMPTY)
                     || !get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
                 return allowPartial && began;
             }
@@ -373,8 +391,19 @@ class Board extends Observable {
         if (gameOver()) {
             throw error("The game is over!");
         }
+        if (get(mov.fromIndex()).equals(PieceColor.EMPTY)) {
+            throw error("You must move a valid piece.");
+        }
+        if (!get(mov.fromIndex()).equals(whoseMove())) {
+            throw error("You may only move your own pieces.");
+        }
+        if (!checkDirection(mov.row1() - mov.row0())) {
+            throw error("You may not move backwards.");
+        }
+
         _moves.add(mov);
         if (mov.isVestigial()) {
+            _whoseMove = _whoseMove.opposite();
             return;
         }
         if (mov.isJump()) {
@@ -407,12 +436,16 @@ class Board extends Observable {
     void undo() {
         if (_moves.size() != 0) {
             Move mov = _moves.remove(_moves.size() - 1);
+            if (mov.isVestigial()) {
+                _whoseMove = _whoseMove.opposite();
+                return;
+            }
             if (mov.isJump()) {
                 MoveList list = new MoveList();
                 for (; mov != null; mov = mov.jumpTail()) {
                     list.add(mov);
                 }
-                PieceColor color = get(list.get(list.size() - 1).toIndex());
+                PieceColor color = whoseMove().opposite();
                 for (int i = list.size() - 1; i >= 0; i--) {
                     Move curMov = list.get(i);
                     set(curMov.fromIndex(), color);

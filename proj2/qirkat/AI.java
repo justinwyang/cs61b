@@ -66,13 +66,13 @@ class AI extends Player {
         int bestScore = (sense == 1) ? -INFTY : INFTY;
 
         ArrayList<Move> moves = board.getMoves();
-        for (Move move : moves) {
-            board.makeMove(move);
+        for (Move mov : moves) {
+            board.makeMove(mov);
             int score = findMove(board, depth - 1, saveMove, -sense,
                     alpha, beta);
             if (sense == 1) {
                 if (score >= bestScore) {
-                    best = move;
+                    best = mov;
                     bestScore = score;
                     alpha = Math.max(alpha, score);
                     if (beta <= alpha) {
@@ -81,7 +81,7 @@ class AI extends Player {
                 }
             } else {
                 if (score <= bestScore) {
-                    best = move;
+                    best = mov;
                     bestScore = score;
                     beta = Math.min(beta, score);
                     if (beta <= alpha) {
