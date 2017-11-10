@@ -10,7 +10,7 @@ import static qirkat.PieceColor.*;
 class AI extends Player {
 
     /** Maximum minimax search depth before going to static evaluation. */
-    private static final int MAX_DEPTH = 5;
+    private static final int MAX_DEPTH = 6;
     /** A position magnitude indicating a win (for white if positive, black
      *  if negative). */
     private static final int WINNING_VALUE = Integer.MAX_VALUE - 1;
@@ -59,23 +59,21 @@ class AI extends Player {
         best = null;
 
         int staticScore = staticScore(board);
-        if (depth == 0 || staticScore == 0) {
+        if (Math.abs(staticScore) == INFTY || depth <= 0) {
             return staticScore;
         }
 
-        int bestScore = (sense == 1) ? -INFTY : INFTY;
+        int bestScore = -INFTY * sense;
 
         ArrayList<Move> moves = board.getMoves();
 
         for (Move mov: moves) {
-            try {
-                board.makeMove(mov);
-            } catch (GameException excp) {
-                continue;
-            }
+            board.makeMove(mov);
+
             int score = findMove(board, depth - 1, saveMove, -sense,
                     alpha, beta);
-            if (sense == 1) {
+
+            if (board().whoseMove().equals(myColor())) {
                 if (score >= bestScore) {
                     best = mov;
                     bestScore = score;
@@ -98,7 +96,11 @@ class AI extends Player {
         }
 
         if (saveMove) {
-            _lastFoundMove = best;
+            if (best != null) {
+                _lastFoundMove = best;
+            } else if (moves.size() > 0){
+                _lastFoundMove = moves.get(0);
+            }
         }
 
         return bestScore;
@@ -106,6 +108,15 @@ class AI extends Player {
 
     /** Return a heuristic value for BOARD. */
     private int staticScore(Board board) {
-        return board.getMoves().size();
+        int staticScore;
+        if (board.gameOver()) {
+            staticScore = INFTY;
+        } else {
+            staticScore = board.getMoves().size();
+        }
+        if (!board.whoseMove().equals(myColor())) {
+            staticScore = -staticScore;
+        }
+        return staticScore;
     }
 }

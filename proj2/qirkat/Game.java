@@ -66,6 +66,7 @@ class Game {
                     move = black.myMove();
                 }
 
+
                 if (move == null) {
                     continue;
                 }

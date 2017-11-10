@@ -401,7 +401,7 @@ class Board extends Observable {
         assert legalMove(mov);
         Move origMov = mov;
 
-        if (get(mov.fromIndex()).equals(PieceColor.EMPTY)) {
+        if (!get(mov.toIndex()).equals(PieceColor.EMPTY)) {
             throw error("You must move a valid piece.");
         }
         if (!get(mov.fromIndex()).equals(whoseMove())) {
@@ -427,6 +427,9 @@ class Board extends Observable {
             }
             if (!legalNonCapture(mov)) {
                 throw error("That move is illegal.");
+            }
+            if (jumpPossible()) {
+                throw error("A jump is possible.");
             }
             set(mov.toIndex(), whoseMove());
             set(mov.fromIndex(), EMPTY);
