@@ -74,6 +74,13 @@ class Game {
                 try {
                     if (_state == PLAYING) {
                         _board.makeMove(move);
+                        if ((_board.whoseMove().equals(WHITE)
+                                && white instanceof AI)
+                                || (_board.whoseMove().equals(BLACK)
+                                && black instanceof AI)) {
+                            _reporter.moveMsg("%s moves %s.",
+                                    _board.whoseMove().toString(), move);
+                        }
                     }
                 } catch (GameException excp) {
                     _reporter.errMsg(excp.getMessage());
