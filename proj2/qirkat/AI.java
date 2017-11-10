@@ -98,7 +98,7 @@ class AI extends Player {
         if (saveMove) {
             if (best != null) {
                 _lastFoundMove = best;
-            } else if (moves.size() > 0){
+            } else if (moves.size() > 0) {
                 _lastFoundMove = moves.get(0);
             }
         }
