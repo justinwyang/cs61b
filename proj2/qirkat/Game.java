@@ -59,7 +59,6 @@ class Game {
 
             while (_state != SETUP && !_board.gameOver()) {
                 Move move;
-
                 if (_board.whoseMove().equals(WHITE)) {
                     move = white.myMove();
                 } else {
@@ -73,13 +72,12 @@ class Game {
 
                 try {
                     if (_state == PLAYING) {
+                        PieceColor cur = _board.whoseMove();
                         _board.makeMove(move);
-                        if ((_board.whoseMove().equals(WHITE)
-                                && white instanceof AI)
-                                || (_board.whoseMove().equals(BLACK)
-                                && black instanceof AI)) {
+                        if ((cur.equals(WHITE) && white instanceof AI)
+                                || (cur.equals(BLACK) && black instanceof AI)) {
                             _reporter.moveMsg("%s moves %s.",
-                                    _board.whoseMove().toString(), move);
+                                    cur.toString(), move);
                         }
                     }
                 } catch (GameException excp) {
