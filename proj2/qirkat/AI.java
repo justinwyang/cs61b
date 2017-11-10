@@ -10,7 +10,7 @@ import static qirkat.PieceColor.*;
 class AI extends Player {
 
     /** Maximum minimax search depth before going to static evaluation. */
-    private static final int MAX_DEPTH = 5;
+    private static final int MAX_DEPTH = 4;
     /** A position magnitude indicating a win (for white if positive, black
      *  if negative). */
     private static final int WINNING_VALUE = Integer.MAX_VALUE - 1;
