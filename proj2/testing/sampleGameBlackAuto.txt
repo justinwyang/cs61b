@@ -1,0 +1,26 @@
+auto black
+start
+dump
+c2-c3
+dump
+c1-c3
+dump
+c3-a3
+dump
+a3-b3
+dump
+b3-c3
+dump
+d2-b2
+dump
+a2-a4
+dump
+e2-c2
+dump
+e1-e3
+dump
+e3-e4
+dump
+a1-a2
+dump
+c2-d2

@@ -1,0 +1,29 @@
+auto white
+manual black
+start
+dump
+d4-b2
+dump
+a3-a1
+dump
+a4-a2
+dump
+a1-c3
+dump
+b4-b2
+dump
+e4-d4
+dump
+d4-d3
+dump
+b5-b3
+dump
+a5-a4
+dump
+b3-c3
+dump
+c5-c3
+dump
+a4-c4
+dump
+e5-e4

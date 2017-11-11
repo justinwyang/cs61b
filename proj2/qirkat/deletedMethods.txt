@@ -1,0 +1,60 @@
+// Two removed methods from Board.java after I replaced getJumps()
+
+@Deprecated
+    /** Helper: Generates jumps from an index k, called recursively.
+     *
+     * @param k The starting index
+     * @return The list of jumps
+     */
+
+    private ArrayList<Move> generateJumps(int k, boolean first) {
+        ArrayList<Move> jumps = generateMoves(k, 2);
+        for (Move mov: generateMoves(k, 2)) {
+            if (first && !get(mov.fromIndex()).equals(whoseMove())) {
+                continue;
+            }
+            if (get(mov.jumpedIndex()).equals(whoseMove().opposite())) {
+                for (Move nextMov: generateJumps(mov.toIndex(), false)) {
+                    jumps.add(Move.move(mov, nextMov));
+                }
+            }
+        }
+        return jumps;
+    }
+
+
+
+    @Deprecated
+    /** Generates a list of possible moves.
+     *
+     * @param k the index
+     * @param len the length of jump
+     * @return a list of moves
+     */
+
+    private ArrayList<Move> generateMoves(int k, int len) {
+        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
+        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
+
+        char c = Move.col(k), r = Move.row(k);
+        int type;
+        if ((c - 'a') % 2 == (r - '1') % 2) {
+            type = 4;
+        } else {
+            type = 8;
+        }
+
+        ArrayList<Move> list = new ArrayList<Move>();
+
+        for (int i = 0; i < type; i++) {
+            if (dc[i] == -((whoseMove().equals(WHITE)) ? 1 : -1)) {
+                continue;
+            }
+            char nc = (char) ((int) c + len * dc[i]),
+                nr = (char) ((int) r + len * dr[i]);
+            if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
+                list.add(Move.move(c, r, nc, nr));
+            }
+        }
+        return list;
+    }
