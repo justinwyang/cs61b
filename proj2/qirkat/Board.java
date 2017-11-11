@@ -185,6 +185,19 @@ class Board extends Observable {
         }
     }
 
+    /** Returns whether the spot has 4 or 8 moves radiating from it.
+     *
+     * @param c column
+     * @param r row
+     * @return the number of moves radiating away
+     */
+    private int type(int c, int r) {
+        if ((c - 'a') % 2 == (r - '1') % 2) {
+            return 8;
+        }
+        return 4;
+    }
+
     /** Add all legal non-capturing moves from the position
      *  with linearized index K to MOVES. */
     private void getMoves(ArrayList<Move> moves, int k) {
@@ -192,26 +205,9 @@ class Board extends Observable {
             return;
         }
 
-        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
-        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
-
         char c = Move.col(k), r = Move.row(k);
-        int type;
-        if ((c - 'a') % 2 == (r - '1') % 2) {
-            type = 8;
-        } else {
-            type = 4;
-        }
-
-        if (!get(k).equals(whoseMove())) {
-            return;
-        }
-
-        for (int i = 0; i < type; i++) {
-            if (!checkDirection(dr[i])) {
-                continue;
-            }
-            char nc = (char) ((int) c + dc[i]), nr = (char) ((int) r + dr[i]);
+        for (int i = 0; i < type(c, r); i++) {
+            char nc = (char) ((int) c + DC[i]), nr = (char) ((int) r + DR[i]);
             if (validSquare(nc, nr) && get(nc, nr).equals(EMPTY)) {
                 Move mov = Move.move(c, r, nc, nr);
                 if (legalNonCapture(mov)) {
@@ -219,20 +215,6 @@ class Board extends Observable {
                 }
             }
         }
-    }
-
-    /** Checks if the mov goes backwards along the row.
-     *
-     * @param mov the move
-     * @return whether or not it satisfies row condition.
-     */
-    private boolean checkRowMove(Move mov) {
-        int dr = mov.row1() - mov.row0();
-        if ((whoseMove().equals(WHITE) && dr == -1)
-                || (whoseMove().equals(BLACK) && dr == 1)) {
-            return false;
-        }
-        return true;
     }
 
     /** Checks whether a move backtracks to a previous slot or not.
@@ -245,7 +227,7 @@ class Board extends Observable {
                 || !get(mov.toIndex()).equals(EMPTY)) {
             return false;
         }
-        if (!checkRowMove(mov)) {
+        if (!checkDirection(mov.row1() - mov.row0())) {
             return false;
         }
         if (!mov.isLeftMove() && !mov.isRightMove()) {
@@ -281,24 +263,14 @@ class Board extends Observable {
     /** Add all legal captures from the position with linearized index K
      *  to MOVES. */
     private void getJumps(ArrayList<Move> moves, int k) {
-        int[] dc = {1, 0, -1, 0, 1, 1, -1, -1};
-        int[] dr = {0, 1, 0, -1, 1, -1, 1, -1};
-
         if (!get(k).equals(whoseMove())) {
             return;
         }
 
         char c = Move.col(k), r = Move.row(k);
-        int type;
-        if ((c - 'a') % 2 == (r - '1') % 2) {
-            type = 8;
-        } else {
-            type = 4;
-        }
-
-        for (int i = 0; i < type; i++) {
-            char nc = (char) ((int) c + 2 * dc[i]),
-                    nr = (char) ((int) r + 2 * dr[i]);
+        for (int i = 0; i < type(c, r); i++) {
+            char nc = (char) ((int) c + 2 * DC[i]),
+                    nr = (char) ((int) r + 2 * DR[i]);
 
             if (!validSquare(nc, nr)) {
                 continue;
@@ -636,4 +608,10 @@ class Board extends Observable {
     /** represents the intial configuration of the board. */
     private static final String INIT_BOARD =
             "wwwww wwwww bb-ww bbbbb bbbbb";
+
+    /** Represents the possible column moves. */
+    private static final int[] DC = {1, 0, -1, 0, 1, 1, -1, -1};
+
+    /** Represents the possible row moves. */
+    private static final int[] DR = {0, 1, 0, -1, 1, -1, 1, -1};
 }
