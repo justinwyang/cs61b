@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.PriorityQueue;
 
 /**
  * Class containing all the sorting algorithms from 61B to date.
@@ -38,7 +39,13 @@ public class MySortingAlgorithms {
     public static class InsertionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            for (int i = 1; i < k; i++) {
+                for (int j = i - 1; j >= 0; j--) {
+                    if (array[j + 1] < array[j]) {
+                        swap(array, j + 1, j);
+                    }
+                }
+            }
         }
 
         @Override
@@ -56,7 +63,16 @@ public class MySortingAlgorithms {
     public static class SelectionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            for (int i = 0; i < k; i++) {
+                int min = array[i], idx = i;
+                for (int j = i + 1; j < k; j++) {
+                    if (array[j] < min) {
+                        min = array[j];
+                        idx = j;
+                    }
+                }
+                swap(array, i, idx);
+            }
         }
 
         @Override
@@ -73,10 +89,47 @@ public class MySortingAlgorithms {
     public static class MergeSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            sortHelper(array, 0, k);
         }
 
-        // may want to add additional methods
+        public void sortHelper(int[] array, int begin, int end) {
+            if (end - begin < 2) {
+                return;
+            }
+            int middle = (begin + end) / 2;
+            sortHelper(array, begin, middle);
+            sortHelper(array, middle, end);
+            merge(array, begin, middle, end);
+        }
+
+        private void merge(int[] array, int begin, int middle, int end) {
+            int[] arr1 = new int[middle - begin];
+            for (int i = begin; i < middle; i++) {
+                arr1[i - begin] = array[i];
+            }
+            int[] arr2 = new int[end - middle];
+            for (int i = middle; i < end; i++) {
+                arr2[i - middle] = array[i];
+            }
+
+            int i = 0, j = 0;
+            while (i < middle - begin || j < end - middle) {
+                int nextIdx = begin + i + j;
+                if (i >= middle - begin) {
+                    array[nextIdx] = arr2[j];
+                    j++;
+                } else if (j >= end - middle) {
+                    array[nextIdx] = arr1[i];
+                    i++;
+                } else if (arr1[i] < arr2[j]) {
+                    array[nextIdx] = arr1[i];
+                    i++;
+                } else {
+                    array[nextIdx] = arr2[j];
+                    j++;
+                }
+            }
+        }
 
         @Override
         public String toString() {
@@ -108,7 +161,13 @@ public class MySortingAlgorithms {
     public static class HeapSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            PriorityQueue<Integer> queue = new PriorityQueue<>();
+            for (int i = 0; i < k; i++) {
+                queue.add(array[i]);
+            }
+            for (int i = 0; i < k; i++) {
+                array[i] = queue.remove();
+            }
         }
 
         @Override
@@ -122,7 +181,28 @@ public class MySortingAlgorithms {
     public static class QuickSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            sortHelper(array, 0, k);
+        }
+
+        private void sortHelper(int[] array, int begin, int end) {
+            if (end - begin < 2) {
+                return;
+            }
+            int idx = partition(array, begin, end);
+            sortHelper(array, begin, idx);
+            sortHelper(array, idx + 1, end);
+        }
+
+        private int partition(int[] array, int begin, int end) {
+            int pivot = array[end - 1];
+            int lowIdx = begin;
+            for (int i = begin; i < end; i++) {
+                if (array[i] <= pivot) {
+                    swap(array, i, lowIdx);
+                    lowIdx++;
+                }
+            }
+            return lowIdx - 1;
         }
 
         @Override

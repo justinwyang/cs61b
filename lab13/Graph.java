@@ -1,4 +1,8 @@
+import javafx.scene.layout.Priority;
+
 import java.util.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class Graph {
 
@@ -65,8 +69,42 @@ public class Graph {
     // an integer array consisting of the shortest distances from 'startVertex'
     // to all other vertices.
     public int[] dijkstras(int startVertex) {
-        // TODO: Your code here!
-        return null;
+        PriorityQueue<Vertex> q = new PriorityQueue<>();
+        int[] dist = new int[vertexCount];
+        for (int i = 0; i < dist.length; i++) {
+            dist[i] = Integer.MAX_VALUE;
+        }
+        dist[startVertex] = 0;
+        q.add(new Vertex(startVertex, 0));
+
+        while (!q.isEmpty()) {
+            Vertex v = q.poll();
+            int vVertex = v.vertex, vDist = v.dist;
+
+            for (Edge w: adjLists[vVertex]) {
+                int wVertex = w.to;
+                int nextDist = vDist + w.edgeWeight;
+                if (nextDist < dist[wVertex]) {
+                    dist[wVertex] = nextDist;
+                    q.add(new Vertex(wVertex, nextDist));
+                }
+            }
+        }
+        return dist;
+    }
+
+    class Vertex implements Comparable<Vertex> {
+        public int vertex, dist;
+
+        public Vertex(int vertex, int dist) {
+            this.vertex = vertex;
+            this.dist = dist;
+        }
+
+        @Override
+        public int compareTo(Vertex v) {
+            return Integer.compare(this.dist, v.dist);
+        }
     }
 
     // Returns the Edge object corresponding to the listed vertices, v1 and v2.
@@ -113,6 +151,9 @@ public class Graph {
         g1.addEdge(2, 3, 1);
         g1.addEdge(4, 3, 1);
 
+        int[] distg1 = g1.dijkstras(0);
+        assertArrayEquals(new int[]{0, 1, 1, 2, 1}, distg1);
+
         Graph g2 = new Graph(5);
         g2.addEdge(0, 1, 1);
         g2.addEdge(0, 2, 1);
@@ -120,5 +161,8 @@ public class Graph {
         g2.addEdge(1, 2, 1);
         g2.addEdge(2, 3, 1);
         g2.addEdge(4, 3, 1);
+
+        int[] distg2 = g2.dijkstras(0);
+        assertArrayEquals(new int[]{0, 1, 1, 2, 1}, distg2);
     }
 }

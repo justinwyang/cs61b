@@ -23,11 +23,11 @@ public class MySortingAlgorithmsTest {
             new MySortingAlgorithms.InsertionSort(),
             new MySortingAlgorithms.SelectionSort(),
             new MySortingAlgorithms.MergeSort(),
-            new MySortingAlgorithms.DistributionSort(),
+            /*new MySortingAlgorithms.DistributionSort(),*/
             new MySortingAlgorithms.HeapSort(),
-            new MySortingAlgorithms.QuickSort(),
+            new MySortingAlgorithms.QuickSort()/*,
             new MySortingAlgorithms.LSDSort(),
-            new MySortingAlgorithms.MSDSort()};
+            new MySortingAlgorithms.MSDSort()*/};
 
         for (SortingAlgorithm sa : algorithms) {
             int[] input = BenchmarkUtility.copy(original);
