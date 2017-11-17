@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.LinkedList;
 
 /**
  * Class containing all the sorting algorithms from 61B to date.
@@ -17,6 +18,8 @@ import java.util.PriorityQueue;
  * All implementations except Distribution Sort adopted from Algorithms,
  * a textbook by Kevin Wayne and Bob Sedgewick. Their code does not
  * obey our style conventions.
+ *
+ * @author Justin Yang
  */
 public class MySortingAlgorithms {
 
@@ -92,6 +95,12 @@ public class MySortingAlgorithms {
             sortHelper(array, 0, k);
         }
 
+        /** Sort helper to be used for MergeSort.
+         *
+         * @param array the array to sort from
+         * @param begin the begin index
+         * @param end the ending index
+         */
         public void sortHelper(int[] array, int begin, int end) {
             if (end - begin < 2) {
                 return;
@@ -102,6 +111,13 @@ public class MySortingAlgorithms {
             merge(array, begin, middle, end);
         }
 
+        /** A merge method for merge sort.
+         *
+         * @param array the array to sort from
+         * @param begin the begin index
+         * @param middle the dividing index
+         * @param end the end index
+         */
         private void merge(int[] array, int begin, int middle, int end) {
             int[] arr1 = new int[middle - begin];
             for (int i = begin; i < middle; i++) {
@@ -145,10 +161,29 @@ public class MySortingAlgorithms {
     public static class DistributionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME: to be implemented
-        }
+            int maxNum = -1;
+            int[] copy = new int[k];
+            for (int i = 0; i < k; i++) {
+                maxNum = Math.max(array[i], maxNum);
+                copy[i] = array[i];
+            }
 
-        // may want to add additional methods
+            int[] count = new int[maxNum + 1];
+            for (int i = 0; i < k; i++) {
+                count[array[i]]++;
+            }
+
+            int[] runningSum = new int[maxNum + 1];
+            runningSum[0] = 0;
+            for (int i = 1; i < runningSum.length; i++) {
+                runningSum[i] = runningSum[i - 1] + count[i - 1];
+            }
+
+            for (int i: copy) {
+                array[runningSum[i]] = i;
+                runningSum[i]++;
+            }
+        }
 
         @Override
         public String toString() {
@@ -184,6 +219,12 @@ public class MySortingAlgorithms {
             sortHelper(array, 0, k);
         }
 
+        /** A helper method to be used for quicksort.
+         *
+         * @param array the array to sort from
+         * @param begin the begin index
+         * @param end the end index
+         */
         private void sortHelper(int[] array, int begin, int end) {
             if (end - begin < 2) {
                 return;
@@ -193,6 +234,13 @@ public class MySortingAlgorithms {
             sortHelper(array, idx + 1, end);
         }
 
+        /** A partition method for quicksort.
+         *
+         * @param array the array to sort form
+         * @param begin the begin index
+         * @param end the end index
+         * @return the index of the pivot
+         */
         private int partition(int[] array, int begin, int end) {
             int pivot = array[end - 1];
             int lowIdx = begin;
@@ -224,7 +272,44 @@ public class MySortingAlgorithms {
     public static class LSDSort implements SortingAlgorithm {
         @Override
         public void sort(int[] a, int k) {
-            // FIXME
+            for (int place = 0; place < k; place++) {
+                sortHelper(a, place, k);
+            }
+        }
+
+        /** A sort helper method for LSDSort.
+         *
+         * @param a the array to sort from
+         * @param place the binary place to sort by
+         * @param k the total number of bits
+         */
+        private void sortHelper(int[] a, int place, int k) {
+            LinkedList<Integer>[] buckets = new LinkedList[2];
+            for (int i = 0; i < buckets.length; i++) {
+                buckets[i] = new LinkedList<Integer>();
+            }
+
+            for (int i = 0; i < k; i++) {
+                buckets[getDigit(a[i], place)].add(a[i]);
+            }
+
+            int idx = 0;
+            for (LinkedList l: buckets) {
+                for (Object num: l) {
+                    a[idx] = (Integer) num;
+                    idx++;
+                }
+            }
+        }
+
+        /** A helper method to obtain the digit at a certain place.
+         *
+         * @param num the number to analyze.
+         * @param place the place of the bit needed
+         * @return the obtained bit
+         */
+        private int getDigit(int num, int place) {
+            return (num >>> place) & 1;
         }
 
         @Override
@@ -239,7 +324,52 @@ public class MySortingAlgorithms {
     public static class MSDSort implements SortingAlgorithm {
         @Override
         public void sort(int[] a, int k) {
-            // FIXME
+            sortHelper(a, 0, k, k - 1);
+        }
+
+        /** A sort helped method for MSDSort.
+         *
+         * @param a the array to sort from
+         * @param begin the begin index to sort
+         * @param end the end index to sort
+         * @param place the bit place
+         */
+        private void sortHelper(int[] a, int begin, int end, int place) {
+            if (place < 0) {
+                return;
+            }
+            if (end - begin < 2) {
+                return;
+            }
+
+            LinkedList<Integer>[] buckets = new LinkedList[2];
+            for (int i = 0; i < buckets.length; i++) {
+                buckets[i] = new LinkedList<Integer>();
+            }
+
+            for (int i = begin; i < end; i++) {
+                buckets[getDigit(a[i], place)].add(a[i]);
+            }
+
+            int idx = begin;
+            for (LinkedList l: buckets) {
+                int tempStart = idx;
+                for (Object num: l) {
+                    a[idx] = (Integer) num;
+                    idx++;
+                }
+                sortHelper(a, tempStart, idx, place - 1);
+            }
+        }
+
+        /** A helper method to obtain the digit at a certain place.
+         *
+         * @param num the number to analyze.
+         * @param place the place of the bit needed
+         * @return the obtained bit
+         */
+        private int getDigit(int num, int place) {
+            return (num >>> place) & 1;
         }
 
         @Override

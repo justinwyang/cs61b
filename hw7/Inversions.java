@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** HW #8, Optional Problem 5b.
- *  @author
+ *  @author Justin Yang
  */
 public class Inversions {
 
@@ -15,7 +15,7 @@ public class Inversions {
     /** Return the number of inversions of T objects in ARGS. */
     public static <T extends Comparable<? super T>> int inversions(List<T> args)
     {
-        return 0; // REPLACE WITH YOUR ANSWER
+        return 0;
     }
 
 }

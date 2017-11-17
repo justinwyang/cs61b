@@ -1,6 +1,8 @@
 /**
  * A sorting algorithm (e.g. Selection Sort, Insertion Sort, etc.)
  * that implements a single sort method.
+ *
+ * @author instructor
  */
 public interface SortingAlgorithm {
 
