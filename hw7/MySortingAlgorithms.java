@@ -277,6 +277,7 @@ public class MySortingAlgorithms {
             }
         }
 
+        @SuppressWarnings("unchecked")
         /** A sort helper method for LSDSort.
          *
          * @param a the array to sort from
@@ -318,6 +319,7 @@ public class MySortingAlgorithms {
         }
     }
 
+    @SuppressWarnings("unchecked")
     /**
      * MSD Sort implementation.
      */
