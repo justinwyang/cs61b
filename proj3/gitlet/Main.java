@@ -1,7 +1,10 @@
 package gitlet;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
- *  @author
+ *
+ * Acknowledgements: Allen Chen (SID: 3032657006)
+ *
+ *  @author Justin Yang
  */
 public class Main {
 
