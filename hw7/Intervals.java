@@ -28,7 +28,9 @@ public class Intervals {
                 prev = cur;
             }
         }
-        len += prev[1] - prev[0];
+        if (prev != null) {
+            len += prev[1] - prev[0];
+        }
 
         return len;
     }
