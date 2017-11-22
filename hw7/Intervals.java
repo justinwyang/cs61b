@@ -15,7 +15,7 @@ public class Intervals {
         intervals.sort(new Compare());
 
         int len = 0;
-        int[] prev = null;
+        int[] prev = {0, 0};
         for (int[] cur: intervals) {
             if (prev != null) {
                 if (cur[0] <= prev[1]) {
@@ -28,9 +28,7 @@ public class Intervals {
                 prev = cur;
             }
         }
-        if (prev != null) {
-            len += prev[1] - prev[0];
-        }
+        len += prev[1] - prev[0];
 
         return len;
     }
