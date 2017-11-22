@@ -17,14 +17,10 @@ public class Intervals {
         int len = 0;
         int[] prev = {0, 0};
         for (int[] cur: intervals) {
-            if (prev != null) {
-                if (cur[0] <= prev[1]) {
-                    prev = new int[] {prev[0], Math.max(prev[1], cur[1])};
-                } else {
-                    len += prev[1] - prev[0];
-                    prev = cur;
-                }
+            if (cur[0] <= prev[1]) {
+                prev = new int[] {prev[0], Math.max(prev[1], cur[1])};
             } else {
+                len += prev[1] - prev[0];
                 prev = cur;
             }
         }
