@@ -1,4 +1,4 @@
-SHELL = bash
+mSHELL = bash
 
 STYLEPROG = style61b
 

@@ -2,7 +2,7 @@ package gitlet;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *
- * Acknowledgements: Allen Chen (SID: 3032657006)
+ *  Acknowledgements: Allen Chen (SID: 3032657006)
  *
  *  @author Justin Yang
  */
