@@ -2,7 +2,7 @@ package gitlet;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *
- *  Acknowledgements: Allen Chen (SID: 3032657006)
+ *  Acknowledgements: I discussed the project with Allen Chen (SID: 3032657006)
  *
  *  @author Justin Yang
  */
@@ -11,7 +11,21 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
     public static void main(String... args) {
-        // FILL THIS IN
+        try {
+            if (args.length <= 0) {
+                throw new GitletException("Please enter a command.");
+            }
+
+            String[] operands = new String[args.length - 1];
+            for (int i = 1; i < args.length; i++) {
+                operands[i - 1] = args[i];
+            }
+
+            new Gitlet().process(args[0], operands);
+
+        } catch (GitletException error) {
+            System.out.println(error.getMessage());
+        }
     }
 
 }

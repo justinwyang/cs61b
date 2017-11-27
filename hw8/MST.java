@@ -22,7 +22,7 @@ public class MST {
         Arrays.sort(edges, EDGE_WEIGHT_COMPARATOR);
 
         UnionFind union = new UnionFind(V);
-        int[][] treeEdges = new int[E.length][];
+        int[][] result = new int[V - 1][];
         int num = 0;
         for (int[] edge: edges) {
             int u = edge[0], v = edge[1];
@@ -30,12 +30,9 @@ public class MST {
                 continue;
             }
             union.union(u, v);
-            treeEdges[num] = edge;
+            result[num] = edge;
             num++;
         }
-
-        int[][] result = new int[num][];
-        System.arraycopy(treeEdges, 0, result, 0, num);
         return result;
     }
 
