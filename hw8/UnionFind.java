@@ -3,6 +3,9 @@
  *  with their union.  At any given time, for a structure partitioning
  *  the integers 1-N, each partition is represented by a unique member of that
  *  partition, called its representative.
+ *
+ *  Source: Wikipedia
+ *
  *  @author Justin Yang
  */
 public class UnionFind {
