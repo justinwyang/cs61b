@@ -1,5 +1,6 @@
 package gitlet;
 
+import static gitlet.Utils.error;
 import java.io.File;
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -21,19 +22,27 @@ public class Gitlet {
      */
     public void process(String command, String[] operands) {
         if (!_commands.containsKey(command)) {
-            throw new GitletException("No command with that name exists.");
+            throw error("No command with that name exists.");
+        }
+        File gitletDir = new File(GITLET_DIR);
+        if (command.equals("init") && gitletDir.exists()) {
+            throw error
+                    ("A Gitlet version-control system already exists in the current directory.");
+        }
+        if (!command.equals("init") && !gitletDir.exists()) {
+            throw error
+                    ("Not in an initialized Gitlet directory.");
         }
         _commands.get(command).accept(operands);
     }
 
     /** Checks for the correct number of operands.
      *
-     * @param operands the operands to check
      * @param num the required number of operands
      */
     public void checkOperands(String[] operands, int num) {
         if (num != operands.length) {
-            throw new GitletException("Incorrect operands.");
+            throw error("Incorrect operands.");
         }
     }
 
@@ -42,13 +51,8 @@ public class Gitlet {
      * @param operands operands for init (Should be none)
      */
     public void init(String[] operands) {
-        checkOperands(operands, 0);
         File gitletDir = new File(GITLET_DIR);
-        if (gitletDir.exists()) {
-            throw new GitletException
-                    ("A Gitlet version-control system already exists in the current directory.");
-        }
-
+        checkOperands(operands, 0);
         gitletDir.mkdir();
 
     }

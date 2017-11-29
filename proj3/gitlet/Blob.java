@@ -2,17 +2,29 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.HashMap;
 
 
-/** Represents the contents of files.
+/** Utility class for managing blobs.
  *
  *  @author Justin Yang
  */
-public class Blob implements Serializable {
+public class Blob {
 
-    public Blob(String filename) {
-        this._filename = filename;
-        this._hash = Utils.sha1(_filename, Utils.readContents(new File(_filename)));
+    /** This class should not be instantiated. */
+    private Blob() {}
+
+    @SuppressWarnings("unchecked")
+    public void init() {
+        if (SERIALIZE.exists()) {
+            _blobs = Utils.readObject(serialized, HashMap.class);
+        } else {
+            _blobs = new HashMap<>();
+        }
+    }
+
+    public void serialize() {
+        Utils.writeObject(new File(METADATA_PATH));
     }
 
     public boolean equals(Object other) {
@@ -22,9 +34,13 @@ public class Blob implements Serializable {
         return false;
     }
 
-    /** The filename this current Blob tracks. */
-    private String _filename;
+    public String retrieveName(String name) {
+        return _names.get(name);
+    }
 
-    /** The hash value for this blob. */
-    private String _hash;
+
+
+    private static HashMap<String, String> _blobs;
+
+    private static final File SERIALIZE = new File(Gitlet.GITLET_DIR + ".blobs");
 }

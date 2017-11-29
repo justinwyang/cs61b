@@ -1,5 +1,7 @@
 package gitlet;
 
+import static gitlet.Utils.error;
+
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *
  *  Acknowledgements: I discussed the project with Allen Chen (SID: 3032657006)
@@ -13,7 +15,7 @@ public class Main {
     public static void main(String... args) {
         try {
             if (args.length <= 0) {
-                throw new GitletException("Please enter a command.");
+                throw error("Please enter a command.");
             }
 
             String[] operands = new String[args.length - 1];

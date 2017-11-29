@@ -15,9 +15,12 @@ public class UnitTest {
         textui.runClasses(UnitTest.class);
     }
 
-    /** A dummy test to avoid complaint. */
+    /** Tests the Commit class. */
     @Test
-    public void placeholderTest() {
+    public void CommitTest() {
+        Commit commit = new Commit("hi", "asdf", "0");
+        commit.writeCommit();
+
     }
 
 }
