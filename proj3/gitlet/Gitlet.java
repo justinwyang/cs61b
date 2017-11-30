@@ -58,7 +58,6 @@ public class Gitlet {
     }
 
     public void add(String[] operands) {
-
     }
 
     public void commit(String[] operands) {
@@ -70,7 +69,9 @@ public class Gitlet {
     }
 
     public void log(String[] operands) {
-
+        for (Commit commit = getBranch().head(); commit != null; commit = commit.parent()) {
+            System.out.println(commit);
+        }
     }
 
     public void globalLog(String[] operands) {
@@ -105,6 +106,10 @@ public class Gitlet {
 
     }
 
+    public Branch getBranch() {
+        return _branch;
+    }
+
     /** Mapping of commands to methods that process them. */
     private final HashMap<String, Consumer<String[]>> _commands =
             new HashMap<>(); {
@@ -123,7 +128,9 @@ public class Gitlet {
         _commands.put("merge", this::merge);
     }
 
+    private Branch _branch;
+
     /** The path for the main gitlet directory. */
-    public static final String GITLET_DIR = ".gitlet/";
+    static final String GITLET_DIR = ".gitlet/";
 
 }
