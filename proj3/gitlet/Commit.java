@@ -1,10 +1,11 @@
 package gitlet;
 
+
+import gitlet.Branch;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +27,7 @@ public class Commit implements Serializable {
         this._blobs = new HashSet<>();
     }
 
-    /** Constructor for adding a commit to the tree.
+    /** Constructor for creating a commit to add to the tree.
      *
      * @param parent
      * @param message
@@ -37,7 +38,7 @@ public class Commit implements Serializable {
         this._message = message;
         this._date = new Date();
         this._commitID = Utils.sha1(this._date.toString());
-        this._blobs = (HashSet<String>) parent()._blobs.clone();
+        this._blobs = (HashSet<Blob>) parent()._blobs.clone();
     }
 
     /** Returns the parent of the current commit.
@@ -51,30 +52,23 @@ public class Commit implements Serializable {
         return readCommit(_parent);
     }
 
-    public static Commit readCommit(String commitID) {
-        return Utils.readObject(new File(COMMIT_DIR + commitID), Commit.class);
-    }
-
-    ///Finish later
     public String toString() {
         String str = "commit " + _commitID + "\n";
         if (_mergedParent != null) {
             str += "Merge: " + _parent.substring(0, 7) + _mergedParent.substring(0, 7) + "\n";
         }
-//        str += String.format("Date: %s %s %d %d:%d:%d %d ")
-
+        str += String.format("Date: %ta %tb %te %tT %tY %tz\n", _date, _date, _date, _date, _date, _date);
+        str += _message + "\n\n";
         return str;
     }
 
-    // change later?
-    public boolean contains(File file) {
-        return _blobs.contains(Blob.sha1(file));
+    public boolean contains(Blob blob) {
+        return _blobs.contains(blob);
     }
 
-//    public void writeCommit() {
-//        Utils.writeObject(new File(_METADATA_PATH), this);
-//    }
-
+    public static Commit readCommit(String commitID) {
+        return Utils.readObject(new File(COMMIT_DIR + commitID), Commit.class);
+    }
 
     private Branch _branch;
 
@@ -91,7 +85,7 @@ public class Commit implements Serializable {
     /** The timestamp. */
     private Date _date;
 
-    private HashSet<String> _blobs;
+    private HashSet<Blob> _blobs;
 
-    private static final String COMMIT_DIR = Gitlet.GITLET_DIR + "commits/";
+    static final String COMMIT_DIR = Gitlet.GITLET_DIR + "commits/";
 }

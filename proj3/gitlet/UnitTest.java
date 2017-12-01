@@ -18,7 +18,8 @@ public class UnitTest {
     /** Tests the Commit class. */
     @Test
     public void CommitTest() {
-
+        Commit commit = new Commit();
+        System.out.println(commit);
     }
 
 }

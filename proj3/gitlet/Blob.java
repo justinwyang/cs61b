@@ -9,15 +9,32 @@ import java.util.HashMap;
  *
  *  @author Justin Yang
  */
-public class Blob {
+public class Blob implements Serializable {
 
-    @SuppressWarnings("unchecked")
-    public void init() {
-        if (SERIALIZED_FILE.exists()) {
-            _blobs = Utils.readObject(SERIALIZED_FILE, HashMap.class);
-        } else {
-            _blobs = new HashMap<>();
-        }
+    public Blob(String filename) {
+        this._filename = filename;
+        this._hash = sha1(filename);
+    }
+
+    public String filename() {
+        return _filename;
+    }
+
+    public String hash() {
+        return _hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ((Blob) obj).hash().equals(hash());
+    }
+
+    public void write() {
+        Utils.writeContents(new File(BLOB_PATH + hash()), Utils.readContentsAsString(new File(_filename)));
+    }
+
+    public void restore() {
+
     }
 
     /** Computes the sha of a file in the working directory.
@@ -30,21 +47,12 @@ public class Blob {
         return Utils.sha1(file.getName(), Utils.readContents(file));
     }
 
+    /** The Blob's filename. */
+    private String _filename;
 
-    public void serialize() {
-        Utils.writeObject(SERIALIZED_FILE, _blobs);
-    }
+    /** The Blob's hash. */
+    private String _hash;
 
-    public static void add(String filename) {
-        File file = new File(filename);
-        _blobs.put(sha1(filename), file.getPath());
-    }
-
-    public String retrieveName(String hash) {
-        return _blobs.get(hash);
-    }
-
-    private static HashMap<String, String> _blobs;
-
-    private static final File SERIALIZED_FILE = new File(gitlet.Gitlet.GITLET_DIR + ".blobs/");
+    /** The path to store the blobs in when adding a file. */
+    static final String BLOB_PATH = Gitlet.GITLET_DIR + "blobs/";
 }

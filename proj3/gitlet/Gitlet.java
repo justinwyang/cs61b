@@ -51,31 +51,36 @@ public class Gitlet {
      * @param operands operands for init (Should be none)
      */
     public void init(String[] operands) {
-        File gitletDir = new File(GITLET_DIR);
         checkOperands(operands, 0);
+        File gitletDir = new File(GITLET_DIR);
         gitletDir.mkdir();
-
     }
 
     public void add(String[] operands) {
+        checkOperands(operands, 1);
+        _branch.add(operands[0]);
     }
 
     public void commit(String[] operands) {
-
+        checkOperands(operands, 1);
+        _branch.commit(operands[0]);
     }
 
     public void rm(String[] operands) {
-
+        checkOperands(operands, 1);
+        _branch.remove(operands[0]);
     }
 
     public void log(String[] operands) {
-        for (Commit commit = getBranch().head(); commit != null; commit = commit.parent()) {
-            System.out.println(commit);
+        for (Commit commit = _branch.head(); commit != null; commit = commit.parent()) {
+            System.out.print(commit);
         }
     }
 
     public void globalLog(String[] operands) {
-
+        for (String commitID: Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
+            System.out.print(Commit.readCommit(commitID));
+        }
     }
 
     public void find(String[] operands) {
@@ -104,10 +109,6 @@ public class Gitlet {
 
     public void merge(String[] operands) {
 
-    }
-
-    public Branch getBranch() {
-        return _branch;
     }
 
     /** Mapping of commands to methods that process them. */
