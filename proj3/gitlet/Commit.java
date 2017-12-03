@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.Date;
 
@@ -18,27 +18,32 @@ import java.util.Date;
 
 public class Commit implements Serializable {
 
-    /** Constructor for initial commit. */
+    /** Constructor for initial Commit.
+     *  Serializes the Commit immediately.
+     */
     public Commit() {
         this._parent = null;
         this._message = "initial commit";
         this._date = new Date(0L);
         this._commitID = Utils.sha1(this._date.toString());
-        this._blobs = new HashSet<>();
+        this._blobs = new HashMap<>();
+        writeCommit();
     }
 
-    /** Constructor for creating a commit to add to the tree.
+    /** Constructor for creating a Commit to add to the tree.
+     *  Serializes the Commit immediately.
      *
      * @param parent
      * @param message
      */
     @SuppressWarnings("unchecked")
-    public Commit(String parent, String message) {
+    public Commit(String parent, String message, HashMap<String, Blob> blobs) {
         this._parent = parent;
         this._message = message;
         this._date = new Date();
         this._commitID = Utils.sha1(this._date.toString());
-        this._blobs = (HashSet<Blob>) parent()._blobs.clone();
+        this._blobs = blobs;
+        writeCommit();
     }
 
     /** Returns the parent of the current commit.
@@ -63,11 +68,31 @@ public class Commit implements Serializable {
     }
 
     public boolean contains(Blob blob) {
-        return _blobs.contains(blob);
+        return _blobs.containsValue(blob);
+    }
+
+    public String commitID() {
+        return _commitID;
+    }
+
+    public String message() {
+        return _message;
+    }
+
+    public HashMap<String, Blob> blobs() {
+        return _blobs;
     }
 
     public static Commit readCommit(String commitID) {
         return Utils.readObject(new File(COMMIT_DIR + commitID), Commit.class);
+    }
+
+    public void writeCommit() {
+        Utils.writeObject(new File(COMMIT_DIR + _commitID), this);
+    }
+
+    public boolean equals(Object obj) {
+        return ((Commit) obj).commitID().equals(commitID());
     }
 
     private Branch _branch;
@@ -85,7 +110,8 @@ public class Commit implements Serializable {
     /** The timestamp. */
     private Date _date;
 
-    private HashSet<Blob> _blobs;
+    private HashMap<String, Blob> _blobs;
 
+    /** The path that Gitlet Commits are stored under. */
     static final String COMMIT_DIR = Gitlet.GITLET_DIR + "commits/";
 }

@@ -1,25 +1,35 @@
 package gitlet;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.HashMap;
 
-
-/** Utility class for managing blobs.
+/** Represents a Blob object.
  *
  *  @author Justin Yang
  */
-public class Blob implements Serializable {
+public class Blob {
 
+    /** Constructor for Blob, which also saves a copy of the file in its current state.
+     *
+     * @param filename the filename of the Blob to be created.
+     */
     public Blob(String filename) {
         this._filename = filename;
         this._hash = sha1(filename);
+        Utils.writeContents(new File(BLOB_DIR + hash()), Utils.readContentsAsString(new File(_filename)));
     }
 
+    /** Returns the filename of the current Blob.
+     *
+     * @return the filename of the current Blob.
+     */
     public String filename() {
         return _filename;
     }
 
+    /** Calculates the hash for the current Blob based on the filename.
+     *
+     * @return the hash for the current Blob.
+     */
     public String hash() {
         return _hash;
     }
@@ -29,18 +39,10 @@ public class Blob implements Serializable {
         return ((Blob) obj).hash().equals(hash());
     }
 
-    public void write() {
-        Utils.writeContents(new File(BLOB_PATH + hash()), Utils.readContentsAsString(new File(_filename)));
-    }
-
-    public void restore() {
-
-    }
-
     /** Computes the sha of a file in the working directory.
      *
-     * @param filename
-     * @return
+     * @param filename the file whose sha1 value is to be determined
+     * @return the sha1 value of filename
      */
     public static String sha1(String filename) {
         File file = new File(filename);
@@ -50,9 +52,9 @@ public class Blob implements Serializable {
     /** The Blob's filename. */
     private String _filename;
 
-    /** The Blob's hash. */
+    /** THe Blob's hash value. */
     private String _hash;
 
-    /** The path to store the blobs in when adding a file. */
-    static final String BLOB_PATH = Gitlet.GITLET_DIR + "blobs/";
+    /** The path that Gitlet Blobs are stored under. */
+    static final String BLOB_DIR = Gitlet.GITLET_DIR + "blobs/";
 }
