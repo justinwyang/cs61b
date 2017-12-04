@@ -1,21 +1,31 @@
 package gitlet;
 
 import java.io.File;
+import java.io.Serializable;
 
 /** Represents a Blob object.
  *
  *  @author Justin Yang
  */
-public class Blob {
+public class Blob implements Serializable {
 
-    /** Constructor for Blob, which also saves a copy of the file in its current state.
+    /** Constructor for Blob, which also saves a copy of the
+     *  file in its current state.
      *
      * @param filename the filename of the Blob to be created.
      */
     public Blob(String filename) {
         this._filename = filename;
         this._hash = sha1(filename);
-        Utils.writeContents(new File(BLOB_DIR + hash()), Utils.readContentsAsString(new File(_filename)));
+        Utils.writeContents(new File(BLOB_DIR + hash()),
+                Utils.readContentsAsString(new File(_filename)));
+    }
+
+    /** Restores the version saved in the current
+     *  blob into the working directory. */
+    public void restore() {
+        Utils.writeContents(new File(_filename),
+                Utils.readContentsAsString(new File(BLOB_DIR + hash())));
     }
 
     /** Returns the filename of the current Blob.
@@ -34,9 +44,25 @@ public class Blob {
         return _hash;
     }
 
+    /** Returns the String representation, given by its hash.
+     *  Used when obtaining the String representation of _blobs for Commit,
+     *  which helps differentiate between different Commits made at
+     *  nearly the same time.
+     *
+     * @return the hash value of the Blob.
+     */
+    public String toString() {
+        return hash();
+    }
+
     @Override
     public boolean equals(Object obj) {
         return ((Blob) obj).hash().equals(hash());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     /** Computes the sha of a file in the working directory.
