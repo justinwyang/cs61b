@@ -139,11 +139,16 @@ public class Gitlet {
      */
     public void find(String[] operands) {
         checkOperands(operands, 1);
+        boolean found = false;
         for (String commitID: Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
             Commit commit = Commit.readCommit(commitID);
             if (commit.message().equals(operands[0])) {
                 System.out.print(commit);
+                found = true;
             }
+        }
+        if (!found) {
+            throw error("Found no commit with that message.");
         }
     }
 
