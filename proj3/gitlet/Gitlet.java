@@ -176,24 +176,13 @@ public class Gitlet {
         System.out.println();
 
         System.out.println("=== Modifications Not Staged For Commit ===");
-        for (Map.Entry<String, Blob> entry: _branch.tracked().entrySet()) {
-            String filename = entry.getKey();
-            Blob blob = entry.getValue();
-            if (_branch.staged().containsKey(filename)) {
-                continue;
-            }
-            if (!new File(filename).exists()
-                    || !blob.hash().equals(Blob.sha1(filename))) {
-                System.out.println(filename);
+        for (Blob blob: _branch.staged().values()) {
+            if (!_branch.staged().containsKey(blob.filename())) {
+                checkUnstaged(blob);
             }
         }
-        for (Map.Entry<String, Blob> entry: _branch.staged().entrySet()) {
-            String filename = entry.getKey();
-            Blob blob = entry.getValue();
-            if (!new File(filename).exists()
-                    || !blob.hash().equals(Blob.sha1(filename))) {
-                System.out.println(filename);
-            }
+        for (Blob blob: _branch.staged().values()) {
+            checkUnstaged(blob);
         }
         System.out.println();
 
@@ -205,6 +194,19 @@ public class Gitlet {
             }
         }
         System.out.println();
+    }
+
+    /** Checks if a Blob is unstaged, and prints out
+     * the respective description along with the filename if it is.
+     *
+     * @param blob the Blob to check
+     */
+    private void checkUnstaged(Blob blob) {
+        if (!new File(blob.filename()).exists()) {
+            System.out.println(blob.filename() + " (deleted)");
+        } else if (!blob.hash().equals(Blob.sha1(blob.filename()))) {
+            System.out.println(blob.filename() + " (modified)");
+        }
     }
 
     /** Performs a checkout command.
