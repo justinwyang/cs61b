@@ -204,6 +204,7 @@ public class Gitlet {
                 System.out.println(filename);
             }
         }
+        System.out.println();
     }
 
     /** Performs a checkout command.
