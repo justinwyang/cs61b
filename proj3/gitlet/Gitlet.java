@@ -2,6 +2,9 @@ package gitlet;
 
 import static gitlet.Utils.error;
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -159,59 +162,39 @@ public class Gitlet {
     public void status(String[] operands) {
         checkOperands(operands, 0);
 
-        System.out.println("=== Branches ===");
-        for (String branchName: Utils.plainFilenamesIn(Branch.BRANCH_DIR)) {
-            if (branchName.equals(_branch.name())) {
-                System.out.println("*");
+        sortAndPrint(Utils.plainFilenamesIn(Branch.BRANCH_DIR),
+                "=== Branches ===", true);
+
+        sortAndPrint(new ArrayList<>(_branch.staged().keySet()),
+                "=== Staged Files ===", false);
+
+        sortAndPrint(new ArrayList<>(_branch.removed()),
+                "=== Removed Files ===", false);
+
+        sortAndPrint(_branch.unstaged(),
+                "=== Modifications Not Staged For Commit ===", false);
+
+        sortAndPrint(_branch.untracked(),
+                "=== Untracked Files ===", false);
+    }
+
+    /** Sorts the entries of list and prints them for status.
+     *
+     * @param list the list to sort and print
+     * @param header the header label
+     * @param asterisk whether to add asterisk before the current branch
+     */
+    private void sortAndPrint(List<String> list,
+                              String header, boolean asterisk) {
+        System.out.println(header);
+        Collections.sort(list);
+        for (String entry: list) {
+            if (asterisk && _branch.name().equals(entry)) {
+                System.out.print("*");
             }
-            System.out.println(branchName);
-        }
-        System.out.println();
-
-        System.out.println("=== Staged Files ===");
-        for (String filename: _branch.staged().keySet()) {
-            System.out.println(filename);
-        }
-        System.out.println();
-
-        System.out.println("=== Removed Files ===");
-        for (String entry: _branch.removed()) {
             System.out.println(entry);
         }
         System.out.println();
-
-        System.out.println("=== Modifications Not Staged For Commit ===");
-        for (Blob blob: _branch.staged().values()) {
-            if (!_branch.staged().containsKey(blob.filename())) {
-                checkUnstaged(blob);
-            }
-        }
-        for (Blob blob: _branch.staged().values()) {
-            checkUnstaged(blob);
-        }
-        System.out.println();
-
-        System.out.println("=== Untracked Files ===");
-        for (String filename: Utils.plainFilenamesIn(".")) {
-            if (!_branch.tracked().containsKey(filename)
-                    && !_branch.staged().containsKey(filename)) {
-                System.out.println(filename);
-            }
-        }
-        System.out.println();
-    }
-
-    /** Checks if a Blob is unstaged, and prints out
-     * the respective description along with the filename if it is.
-     *
-     * @param blob the Blob to check
-     */
-    private void checkUnstaged(Blob blob) {
-        if (!new File(blob.filename()).exists()) {
-            System.out.println(blob.filename() + " (deleted)");
-        } else if (!blob.hash().equals(Blob.sha1(blob.filename()))) {
-            System.out.println(blob.filename() + " (modified)");
-        }
     }
 
     /** Performs a checkout command.

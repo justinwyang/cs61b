@@ -3,6 +3,7 @@ package gitlet;
 import static gitlet.Utils.error;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
@@ -151,6 +152,55 @@ public class Branch implements Serializable {
      */
     public HashSet<String> removed() {
         return _removed;
+    }
+
+    /** Returns an ArrayList of modified but unstaged files.
+     *
+     * @return the ArrayList of modified by unstaged files
+     */
+    public ArrayList<String> unstaged() {
+        ArrayList<String> unstaged = new ArrayList<>();
+        for (Blob blob: staged().values()) {
+            if (!staged().containsKey(blob.filename())) {
+                unstaged.add(checkUnstaged(blob));
+            }
+        }
+        for (Blob blob: staged().values()) {
+            unstaged.add(checkUnstaged(blob));
+        }
+        return unstaged;
+    }
+
+    /** Checks if a Blob is unstaged, and if it is, returns
+     *  the respective description along with the filename,
+     *  otherwise returns a blank String.
+     *
+     * @param blob the Blob to check
+     * @return the filename and description if unstaged
+     */
+    private String checkUnstaged(Blob blob) {
+        if (!new File(blob.filename()).exists()) {
+            return blob.filename() + " (deleted)";
+        }
+        if (!blob.hash().equals(Blob.sha1(blob.filename()))) {
+            return blob.filename() + " (modified)";
+        }
+        return "";
+    }
+
+    /** Returns an ArrayList of untracked files.
+     *
+     * @return the ArrayList of untracked files
+     */
+    public ArrayList<String> untracked() {
+        ArrayList<String> untracked = new ArrayList<>();
+        for (String filename: Utils.plainFilenamesIn(".")) {
+            if (!tracked().containsKey(filename)
+                    && !staged().containsKey(filename)) {
+                untracked.add(filename);
+            }
+        }
+        return untracked;
     }
 
     /** Returns whether a Branch with the given name exists.
