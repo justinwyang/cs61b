@@ -2,7 +2,6 @@ package gitlet;
 
 import static gitlet.Utils.error;
 import java.io.File;
-import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -156,11 +155,11 @@ public class Gitlet {
         checkOperands(operands, 0);
 
         System.out.println("=== Branches ===");
-        System.out.println("*" + _branch.name());
-        for (String filename: Utils.plainFilenamesIn(Branch.BRANCH_DIR)) {
-            if (!filename.equals(_branch.name())) {
-                System.out.println(filename);
+        for (String branchName: Utils.plainFilenamesIn(Branch.BRANCH_DIR)) {
+            if (branchName.equals(_branch.name())) {
+                System.out.println("*");
             }
+            System.out.println(branchName);
         }
         System.out.println();
 
@@ -177,13 +176,15 @@ public class Gitlet {
         System.out.println();
 
         System.out.println("=== Modifications Not Staged For Commit ===");
-        HashSet<String> unstaged = new HashSet<>();
         for (Map.Entry<String, Blob> entry: _branch.tracked().entrySet()) {
             String filename = entry.getKey();
             Blob blob = entry.getValue();
+            if (_branch.staged().containsKey(filename)) {
+                continue;
+            }
             if (!new File(filename).exists()
                     || !blob.hash().equals(Blob.sha1(filename))) {
-                unstaged.add(filename);
+                System.out.println(filename);
             }
         }
         for (Map.Entry<String, Blob> entry: _branch.staged().entrySet()) {
@@ -191,18 +192,15 @@ public class Gitlet {
             Blob blob = entry.getValue();
             if (!new File(filename).exists()
                     || !blob.hash().equals(Blob.sha1(filename))) {
-                unstaged.add(filename);
+                System.out.println(filename);
             }
-        }
-        for (String filename: unstaged) {
-            System.out.println(filename);
         }
         System.out.println();
 
         System.out.println("=== Untracked Files ===");
         for (String filename: Utils.plainFilenamesIn(".")) {
             if (!_branch.tracked().containsKey(filename)
-                    || !_branch.staged().containsKey(filename)) {
+                    && !_branch.staged().containsKey(filename)) {
                 System.out.println(filename);
             }
         }

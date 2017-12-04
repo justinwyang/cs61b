@@ -44,13 +44,7 @@ public class Blob implements Serializable {
         return _hash;
     }
 
-    /** Returns the String representation, given by its hash.
-     *  Used when obtaining the String representation of _blobs for Commit,
-     *  which helps differentiate between different Commits made at
-     *  nearly the same time.
-     *
-     * @return the hash value of the Blob.
-     */
+    @Override
     public String toString() {
         return hash();
     }

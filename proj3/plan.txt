@@ -1,0 +1,15 @@
+Gitlet:
+-.metadata stores: current commit SHA1
+-.commits: stores previous commits
+
+Blobs:
+-Directory: .blobs
+-One file serializes each blob (by SHA1)
+-SHA1 constructed from name and contents of file
+
+
+Commit:
+-Stored in a folder with the hashID
+-.metadata stores serialized commit
+    -Notes: tree is serialized along with a Commit, but note that metadata runtime
+    doesn't matter so we may scan in all the blobs in metadata
