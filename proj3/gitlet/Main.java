@@ -4,7 +4,7 @@ import static gitlet.Utils.error;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *
- *  Acknowledgements: I discussed and worked on the project with
+ *  Acknowledgements: I discussed and worked on this project with
  *  Allen Chen (SID: 3032657006).
  *
  *  @author Justin Yang

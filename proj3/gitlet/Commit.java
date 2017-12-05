@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Date;
 
 import static gitlet.Utils.error;
@@ -20,8 +21,8 @@ public class Commit implements Serializable {
         this._parent = null;
         this._message = "initial commit";
         this._date = new Date(0L);
-        this._blobs = new HashMap<>();
-        this._commitID = Utils.sha1(this._date.toString(), _blobs.toString());
+        this._tracked = new HashMap<>();
+        this._commitID = Utils.sha1(this._date.toString(), _tracked.toString());
         writeCommit();
     }
 
@@ -31,17 +32,16 @@ public class Commit implements Serializable {
      * @param parent the parent Commit
      * @param mergedParent the parent merged into the Commit
      * @param message the Commit message
-     * @param blobs the blobs to include
+     * @param tracked the blobs to include
      */
-    @SuppressWarnings("unchecked")
     public Commit(String parent, String mergedParent,
-                  String message, HashMap<String, Blob> blobs) {
+                  String message, HashMap<String, Blob> tracked) {
         this._parent = parent;
         this._mergedParent = _mergedParent;
         this._message = message;
         this._date = new Date();
-        this._blobs = blobs;
-        this._commitID = Utils.sha1(this._date.toString(), _blobs.toString());
+        this._tracked = tracked;
+        this._commitID = Utils.sha1(this._date.toString(), _tracked.toString(), this._parent);
         writeCommit();
     }
 
@@ -58,7 +58,7 @@ public class Commit implements Serializable {
 
     /** Restores the contents of the commit to the working directory. */
     public void restore() {
-        for (Blob blob: _blobs.values()) {
+        for (Blob blob: _tracked.values()) {
             blob.restore();
         }
     }
@@ -85,7 +85,7 @@ public class Commit implements Serializable {
      * @return whether the Commit contains the blob
      */
     public boolean contains(Blob blob) {
-        return _blobs.containsValue(blob);
+        return _tracked.containsValue(blob);
     }
 
     /** Returns the CommitID.
@@ -104,12 +104,12 @@ public class Commit implements Serializable {
         return _message;
     }
 
-    /** Returns the stored Blobs.
+    /** Returns the tracked Blobs.
      *
-     * @return the stored Blobs.
+     * @return the tracked Blobs
      */
-    public HashMap<String, Blob> blobs() {
-        return _blobs;
+    public HashMap<String, Blob> tracked() {
+        return _tracked;
     }
 
     /** Searches for a commit with the given CommitID prefix,
@@ -128,6 +128,24 @@ public class Commit implements Serializable {
             }
         }
         throw error("No commit with that id exists.");
+    }
+
+    /** Searches for the split point CommitID of the two Commits.
+     *
+     * @param current the first (current) Commit
+     * @param given the second (given) Commit
+     * @return the split point CommitID
+     */
+    public static String findSplitPoint(Commit current, Commit given) {
+        HashSet<String> commits = new HashSet<>();
+        for (; current != null; current = current.parent()) {
+            commits.add(current.commitID());
+        }
+        int i = 0;
+        for (; given != null; given = given.parent()) {
+            i++;
+        }
+        return null;
     }
 
     /** Reads in a Commit by its CommitID and returns it.
@@ -169,8 +187,8 @@ public class Commit implements Serializable {
     /** The timestamp. */
     private Date _date;
 
-    /** The stored Blob. */
-    private HashMap<String, Blob> _blobs;
+    /** The tracked Blobs. */
+    private HashMap<String, Blob> _tracked;
 
     /** The path that Gitlet Commits are stored under. */
     static final String COMMIT_DIR = Gitlet.GITLET_DIR + "commits/";

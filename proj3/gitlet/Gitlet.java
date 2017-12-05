@@ -45,16 +45,18 @@ public class Gitlet {
         write();
     }
 
-    /** Reads in the necessary metadata to run Gitlet. */
+    /** Reads in the metadata to run Gitlet. */
     public void read() {
         _branch = Branch.readBranch(Utils.readObject
                 (new File(GITLET_DIR + ".branch"), String.class));
+        Stage.read();
     }
 
     /** Saves the metadata for the next run of Gitlet. */
     public void write() {
         _branch.writeBranch();
         Utils.writeObject(new File(GITLET_DIR + ".branch"), _branch.name());
+        Stage.write();
     }
 
     /** Checks for the correct number of operands.
@@ -84,6 +86,7 @@ public class Gitlet {
         blobDir.mkdir();
         Commit head = new Commit();
         _branch = new Branch(head, "master");
+        Stage.reset();
     }
 
     /** Performs an add command.
@@ -92,7 +95,8 @@ public class Gitlet {
      */
     public void add(String[] operands) {
         checkOperands(operands, 1);
-        _branch.add(operands[0]);
+//        _branch.add(operands[0]);
+        Stage.add(operands[0], _branch.head());
     }
 
     /** Performs a commit command.
@@ -108,9 +112,10 @@ public class Gitlet {
      *
      * @param operands operands for rm
      */
-    public void rm(String[] operands) {
+    public void remove(String[] operands) {
         checkOperands(operands, 1);
-        _branch.remove(operands[0]);
+//        _branch.remove(operands[0]);
+        Stage.remove(operands[0], _branch.head());
     }
 
     /** Performs a log command.
@@ -165,10 +170,10 @@ public class Gitlet {
         sortAndPrint(Utils.plainFilenamesIn(Branch.BRANCH_DIR),
                 "=== Branches ===", true);
 
-        sortAndPrint(new ArrayList<>(_branch.staged().keySet()),
+        sortAndPrint(new ArrayList<>(Stage.staged().keySet()),
                 "=== Staged Files ===", false);
 
-        sortAndPrint(new ArrayList<>(_branch.removed()),
+        sortAndPrint(new ArrayList<>(Stage.removed()),
                 "=== Removed Files ===", false);
 
         sortAndPrint(_branch.unstaged(),
@@ -227,7 +232,7 @@ public class Gitlet {
      */
     public void checkoutCommitFile(String prefix, String filename) {
         String found = Commit.findCommit(prefix);
-        HashMap<String, Blob> blobs = Commit.readCommit(found).blobs();
+        HashMap<String, Blob> blobs = Commit.readCommit(found).tracked();
         if (!blobs.containsKey(filename)) {
             throw error("File does not exist in that commit.");
         }
@@ -237,11 +242,11 @@ public class Gitlet {
     /** Checks out a Branch.
      *
      * @param branchName the Branch name to checkout
-     * @param commitID the commitID to checkout from
+     * @param commitID the CommitID to checkout from
      */
     public void checkoutBranch(String branchName, String commitID) {
         Commit commit = Commit.readCommit(commitID);
-        for (Map.Entry<String, Blob> entry: commit.blobs().entrySet()) {
+        for (Map.Entry<String, Blob> entry: commit.tracked().entrySet()) {
             String filename = entry.getKey();
             Blob blob = entry.getValue();
             boolean delete = !new File(filename).exists();
@@ -258,7 +263,7 @@ public class Gitlet {
         commit.restore();
         _branch.writeBranch();
         _branch = Branch.readBranch(branchName);
-        _branch.clearStage();
+        Stage.reset();
     }
 
     /** Performs a branch command.
@@ -308,7 +313,7 @@ public class Gitlet {
      */
     public void merge(String[] operands) {
         checkOperands(operands, 1);
-        if (!_branch.staged().isEmpty() || !_branch.removed().isEmpty()) {
+        if (!Stage.staged().isEmpty() || !Stage.removed().isEmpty()) {
             throw error("You have uncommitted changes.");
         }
         if (!Branch.exists(operands[0])) {
@@ -326,7 +331,7 @@ public class Gitlet {
         _commands.put("init", this::init);
         _commands.put("add", this::add);
         _commands.put("commit", this::commit);
-        _commands.put("rm", this::rm);
+        _commands.put("rm", this::remove);
         _commands.put("log", this::log);
         _commands.put("global-log", this::globalLog);
         _commands.put("find", this::find);
