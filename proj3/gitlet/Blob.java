@@ -24,8 +24,15 @@ public class Blob implements Serializable {
     /** Restores the version saved in the current
      *  blob into the working directory. */
     public void checkout() {
-        Utils.writeContents(new File(_filename),
-                Utils.readContentsAsString(new File(BLOB_DIR + hash())));
+        Utils.writeContents(new File(_filename), contents());
+    }
+
+    /** Returns the contents of the Blob as a String.
+     *
+     * @return the contents of the Blob
+     */
+    public String contents() {
+        return Utils.readContentsAsString(new File(BLOB_DIR + hash()));
     }
 
     /** Returns the filename of the current Blob.

@@ -10,7 +10,7 @@ import static gitlet.Utils.error;
  *
  *  @author Justin Yang
  */
-public class Stage {
+public final class Stage {
 
     /** Don't let anyone instantiate this class. */
     private Stage() {

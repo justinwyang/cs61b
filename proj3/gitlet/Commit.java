@@ -150,6 +150,42 @@ public class Commit implements Serializable {
         return other;
     }
 
+    public HashSet<String> removed(Commit split) {
+        HashSet<String> removed = new HashSet<>();
+        for (String filename: split.tracked().keySet()) {
+            if (!tracked().containsKey(filename)) {
+                removed.add(filename);
+            }
+        }
+        return removed;
+    }
+
+    public HashSet<String> added(Commit split) {
+        HashSet<String> added = new HashSet<>();
+        for (String filename: tracked().keySet()) {
+            if (!split.tracked().containsKey(filename)) {
+                added.add(filename);
+            }
+        }
+        return added;
+    }
+
+    public HashSet<String> modified(Commit split) {
+        HashSet<String> modified = new HashSet<>();
+        for (String filename: tracked().keySet()) {
+            if (split.tracked().containsKey(filename)
+                    && !split.tracked().get(filename).equals(tracked().get(filename))) {
+                modified.add(filename);
+            }
+        }
+        return modified;
+    }
+
+    public static void conflict(Commit cur, Commit other, String filename) {
+        String =
+        Utils.writeObject(new File(filename), cur.tracked().get(filename).conte);
+    }
+
     /** Reads in a Commit by its CommitID and returns it.
      *
      * @param commitID the CommitID of the Commit to read

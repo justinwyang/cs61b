@@ -1,11 +1,13 @@
 package gitlet;
 
-import static gitlet.Utils.error;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
+
+import static gitlet.Utils.error;
 
 /** Represents a Branch object.
  *
@@ -48,7 +50,6 @@ public class Branch implements Serializable {
         Commit next = new Commit(_headID, null, message, Stage.staged());
         _headID = next.commitID();
         Stage.reset();
-
     }
 
     /** Performs a merge operation.
@@ -56,9 +57,9 @@ public class Branch implements Serializable {
      * @param otherBranch the other Branch to merge with
      */
     public void merge(Branch otherBranch) {
-        Commit commit = head();
+        Commit current = head();
         Commit other = otherBranch.head();
-        Commit split = Commit.findSplitPoint(commit, other);
+        Commit split = Commit.findSplitPoint(current, other);
         if (split.equals(otherBranch.head())) {
             System.out.println("Given branch is an ancestor"
                     + " of the current branch.");
@@ -69,15 +70,44 @@ public class Branch implements Serializable {
             System.out.println("Current branch fast-forwarded.");
             return;
         }
+        checkOverwiteUntracked(other);
 
-        for (Map.Entry<String, Blob> entry: split.tracked().entrySet()) {
-            String filename = entry.getKey();
-            Blob blob = entry.getValue();
+        HashSet<String> currentRemoved = current.removed(split);
+        HashSet<String> currentAdded = current.added(split);
+        HashSet<String> currentModified = current.modified(split);
+        HashSet<String> otherRemoved = other.removed(split);
+        HashSet<String> otherAdded = other.added(split);
+        HashSet<String> otherModified = other.modified(split);
 
+        for (String filename: otherModified) {
+            if (!currentModified.contains(filename)) {
+                other.tracked().get(filename).checkout();
+                Stage.add(filename, head());
+            } else if (!current.tracked().get(filename).equals(other.tracked().get(filename))) {
 
+            }
         }
 
 
+    }
+
+    /** Checks to see if a Commit checkout will overwrite
+     *  an untracked file, and throws an error otherwise.
+     *
+     * @param commit the commit to check for
+     */
+    public void checkOverwiteUntracked(Commit commit) {
+        for (Map.Entry<String, Blob> entry: commit.tracked().entrySet()) {
+            String filename = entry.getKey();
+            Blob blob = entry.getValue();
+            if (!tracked().containsKey(filename)) {
+                if (new File(filename).exists()
+                        && !Blob.sha1(filename).equals(blob.hash())) {
+                    throw error("There is an untracked file in the way;"
+                            + " delete it or add it first.");
+                }
+            }
+        }
     }
 
     /** Returns the name.

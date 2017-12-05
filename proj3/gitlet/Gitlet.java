@@ -1,13 +1,13 @@
 package gitlet;
 
-import static gitlet.Utils.error;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
+
+import static gitlet.Utils.error;
 
 /** Controls the main processes of Gitlet.
  *
@@ -247,17 +247,7 @@ public class Gitlet {
      */
     public void checkoutBranch(String branchName, String commitID) {
         Commit commit = Commit.readCommit(commitID);
-        for (Map.Entry<String, Blob> entry: commit.tracked().entrySet()) {
-            String filename = entry.getKey();
-            Blob blob = entry.getValue();
-            if (!_branch.tracked().containsKey(filename)) {
-                if (new File(filename).exists()
-                        && !Blob.sha1(filename).equals(blob.hash())) {
-                    throw error("There is an untracked file in the way;"
-                            + " delete it or add it first.");
-                }
-            }
-        }
+        _branch.checkOverwiteUntracked(commit);
         for (String filename: _branch.tracked().keySet()) {
             if (!commit.tracked().keySet().contains(filename)) {
                 Utils.restrictedDelete(filename);
@@ -289,7 +279,7 @@ public class Gitlet {
      */
     public void rmBranch(String[] operands) {
         checkOperands(operands, 1);
-        if (operands[0].equals(_branch)) {
+        if (operands[0].equals(_branch.name())) {
             throw error("Cannot remove the current branch.");
         }
         File file = new File(Branch.BRANCH_DIR + operands[0]);
