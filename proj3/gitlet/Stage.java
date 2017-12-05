@@ -12,6 +12,10 @@ import static gitlet.Utils.error;
  */
 public class Stage {
 
+    /** Don't let anyone instantiate this class. */
+    private Stage() {
+    }
+
     /** Clears both the staged and empty files,
      * or initializes them if they are null.
      */

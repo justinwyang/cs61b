@@ -149,7 +149,7 @@ public class Gitlet {
         for (String commitID: Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
             Commit commit = Commit.readCommit(commitID);
             if (commit.message().equals(operands[0])) {
-                System.out.print(commit);
+                System.out.println(commit.commitID());
                 found = true;
             }
         }
@@ -250,14 +250,16 @@ public class Gitlet {
         for (Map.Entry<String, Blob> entry: commit.tracked().entrySet()) {
             String filename = entry.getKey();
             Blob blob = entry.getValue();
-            boolean delete = !new File(filename).exists();
             if (!_branch.tracked().containsKey(filename)) {
-                if (delete || !Blob.sha1(filename).equals(blob.hash())) {
+                if (new File(filename).exists()
+                        && !Blob.sha1(filename).equals(blob.hash())) {
                     throw error("There is an untracked file in the way;"
                             + " delete it or add it first.");
                 }
             }
-            if (delete) {
+        }
+        for (String filename: _branch.tracked().keySet()) {
+            if (!commit.tracked().keySet().contains(filename)) {
                 Utils.restrictedDelete(filename);
             }
         }
@@ -277,7 +279,7 @@ public class Gitlet {
             throw error("A branch with that name already exists.");
         }
         Branch other =
-                new Branch(Branch.readBranch(operands[0]).head(), operands[0]);
+                new Branch(_branch.head(), operands[0]);
         other.writeBranch();
     }
 
