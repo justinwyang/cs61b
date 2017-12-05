@@ -136,16 +136,17 @@ public class Commit implements Serializable {
      * @param given the second (given) Commit
      * @return the split point CommitID
      */
-    public static String findSplitPoint(Commit current, Commit given) {
+    public static Commit findSplitPoint(Commit current, Commit given) {
         HashSet<String> commits = new HashSet<>();
         for (; current != null; current = current.parent()) {
             commits.add(current.commitID());
         }
-        int i = 0;
         for (; given != null; given = given.parent()) {
-            i++;
+            if (commits.contains(given)) {
+                break;
+            }
         }
-        return null;
+        return given;
     }
 
     /** Reads in a Commit by its CommitID and returns it.
