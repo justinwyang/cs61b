@@ -4,7 +4,6 @@ import static gitlet.Utils.error;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -22,29 +21,7 @@ public class Branch implements Serializable {
     public Branch(Commit head, String name) {
         this._headID = head.commitID();
         this._name = name;
-//        this._staged = new HashMap<>();
-//        this._removed = new HashSet<>();
     }
-
-    /** Adds a file to the branch if possible,
-     *  saving a copy of the Blob in its current state.
-     *
-     * @param filename the name of the file to add
-     */
-//    public void add(String filename) {
-//        File file = new File(filename);
-//        if (!file.exists()) {
-//            throw error("File does not exist.");
-//        }
-//
-//        Blob blob = new Blob(filename);
-//        if (head().contains(blob)) {
-//            Stage.staged().remove(filename);
-//        } else {
-//            Stage.staged().put(filename, blob);
-//        }
-//        Stage.staged().remove(filename);
-//    }
 
     /** Creates a Commit of the Branch in its current state.
      *
@@ -71,39 +48,37 @@ public class Branch implements Serializable {
         Commit next = new Commit(_headID, null, message, Stage.staged());
         _headID = next.commitID();
         Stage.reset();
-//        _staged = new HashMap<>();
-//        _removed = new HashSet<>();
-    }
 
-    /** Removes a file from _tracked and _commit, as well as the file itself.
-     *
-     * @param filename the name of the file to remove
-     */
-//    public void remove(String filename) {
-//        boolean removed = _staged.remove(filename) != null;
-//        if (tracked().containsKey(filename)) {
-//            removed = true;
-//            _removed.add(filename);
-//            Utils.restrictedDelete(new File(filename));
-//        }
-//        if (!removed) {
-//            throw error("No reason to remove the file.");
-//        }
-//    }
+    }
 
     /** Performs a merge operation.
      *
-     * @param other the other Branch to merge with
+     * @param otherBranch the other Branch to merge with
      */
-    public void merge(Branch other) {
+    public void merge(Branch otherBranch) {
+        Commit commit = head();
+        Commit other = otherBranch.head();
+        Commit split = Commit.findSplitPoint(commit, other);
+        if (split.equals(otherBranch.head())) {
+            System.out.println("Given branch is an ancestor"
+                    + " of the current branch.");
+            return;
+        }
+        if (split.equals(head())) {
+            setHead(otherBranch.head().commitID());
+            System.out.println("Current branch fast-forwarded.");
+            return;
+        }
+
+        for (Map.Entry<String, Blob> entry: split.tracked().entrySet()) {
+            String filename = entry.getKey();
+            Blob blob = entry.getValue();
+
+
+        }
 
 
     }
-
-    /** Clears the stage. */
-//    public void clearStage() {
-//        _staged = new HashMap<>();
-//    }
 
     /** Returns the name.
      *
@@ -129,14 +104,6 @@ public class Branch implements Serializable {
         this._headID = headID;
     }
 
-    /** Returns the staged files.
-     *
-     * @return the staged files
-     */
-//    public HashMap<String, Blob> staged() {
-//        return _staged;
-//    }
-
     /** Returns the tracked files.
      *
      * @return the tracked files
@@ -144,14 +111,6 @@ public class Branch implements Serializable {
     public HashMap<String, Blob> tracked() {
         return head().tracked();
     }
-
-    /** Returns the removed files.
-     *
-     * @return the removed files
-     */
-//    public HashSet<String> removed() {
-//        return _removed;
-//    }
 
     /** Returns an ArrayList of modified but unstaged files.
      *
@@ -179,7 +138,10 @@ public class Branch implements Serializable {
      */
     private String checkUnstaged(Blob blob) {
         if (!new File(blob.filename()).exists()) {
-            return blob.filename() + " (deleted)";
+            if (!Stage.removed().contains(blob.filename())) {
+                return blob.filename() + " (deleted)";
+            }
+            return "";
         }
         if (!blob.hash().equals(Blob.sha1(blob.filename()))) {
             return blob.filename() + " (modified)";
@@ -231,15 +193,6 @@ public class Branch implements Serializable {
 
     /** CommitID of the head commit. */
     private String _headID;
-
-    /** HashMap to hold staged Blobs.
-     *  Will be converted into the _tracked upon committing
-     *  and be provided for the next Commit as the field _blobs.
-     */
-//    private HashMap<String, Blob> _staged;
-
-    /** Tracks the filename of files flagged for removal. */
-//    private HashSet<String> _removed;
 
     /** The path that Gitlet Branches are stored under. */
     static final String BRANCH_DIR = Gitlet.GITLET_DIR + "branch/";

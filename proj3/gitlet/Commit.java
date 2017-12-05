@@ -41,7 +41,8 @@ public class Commit implements Serializable {
         this._message = message;
         this._date = new Date();
         this._tracked = tracked;
-        this._commitID = Utils.sha1(this._date.toString(), _tracked.toString(), this._parent);
+        this._commitID = Utils.sha1(this._date.toString(),
+                _tracked.toString(), this._parent);
         writeCommit();
     }
 
@@ -57,9 +58,9 @@ public class Commit implements Serializable {
     }
 
     /** Restores the contents of the commit to the working directory. */
-    public void restore() {
+    public void checkout() {
         for (Blob blob: _tracked.values()) {
-            blob.restore();
+            blob.checkout();
         }
     }
 
@@ -133,20 +134,20 @@ public class Commit implements Serializable {
     /** Searches for the split point CommitID of the two Commits.
      *
      * @param current the first (current) Commit
-     * @param given the second (given) Commit
+     * @param other the second (given) Commit
      * @return the split point CommitID
      */
-    public static Commit findSplitPoint(Commit current, Commit given) {
+    public static Commit findSplitPoint(Commit current, Commit other) {
         HashSet<String> commits = new HashSet<>();
         for (; current != null; current = current.parent()) {
             commits.add(current.commitID());
         }
-        for (; given != null; given = given.parent()) {
-            if (commits.contains(given)) {
+        for (; other != null; other = other.parent()) {
+            if (commits.contains(other)) {
                 break;
             }
         }
-        return given;
+        return other;
     }
 
     /** Reads in a Commit by its CommitID and returns it.

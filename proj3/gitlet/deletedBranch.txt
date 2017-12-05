@@ -1,0 +1,91 @@
+Branch.java
+
+From Constructor:
+
+//        this._staged = new HashMap<>();
+//        this._removed = new HashSet<>();
+
+---
+
+    /** Adds a file to the branch if possible,
+     *  saving a copy of the Blob in its current state.
+     *
+     * @param filename the name of the file to add
+     */
+//    public void add(String filename) {
+//        File file = new File(filename);
+//        if (!file.exists()) {
+//            throw error("File does not exist.");
+//        }
+//
+//        Blob blob = new Blob(filename);
+//        if (head().contains(blob)) {
+//            Stage.staged().remove(filename);
+//        } else {
+//            Stage.staged().put(filename, blob);
+//        }
+//        Stage.staged().remove(filename);
+//    }
+
+---
+
+From public void commit(String message):
+
+//        _staged = new HashMap<>();
+//        _removed = new HashSet<>();
+
+---
+
+    /** Removes a file from _tracked and _commit, as well as the file itself.
+     *
+     * @param filename the name of the file to remove
+     */
+//    public void remove(String filename) {
+//        boolean removed = _staged.remove(filename) != null;
+//        if (tracked().containsKey(filename)) {
+//            removed = true;
+//            _removed.add(filename);
+//            Utils.restrictedDelete(new File(filename));
+//        }
+//        if (!removed) {
+//            throw error("No reason to remove the file.");
+//        }
+//    }
+
+---
+
+    /** Clears the stage. */
+//    public void clearStage() {
+//        _staged = new HashMap<>();
+//    }
+
+---
+
+ /** Returns the staged files.
+     *
+     * @return the staged files
+     */
+//    public HashMap<String, Blob> staged() {
+//        return _staged;
+//    }
+
+---
+
+    /** Returns the removed files.
+     *
+     * @return the removed files
+     */
+//    public HashSet<String> removed() {
+//        return _removed;
+//    }
+
+---
+
+    /** HashMap to hold staged Blobs.
+     *  Will be converted into the _tracked upon committing
+     *  and be provided for the next Commit as the field _blobs.
+     */
+//    private HashMap<String, Blob> _staged;
+
+    /** Tracks the filename of files flagged for removal. */
+//    private HashSet<String> _removed;

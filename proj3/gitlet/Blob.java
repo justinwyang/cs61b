@@ -23,7 +23,7 @@ public class Blob implements Serializable {
 
     /** Restores the version saved in the current
      *  blob into the working directory. */
-    public void restore() {
+    public void checkout() {
         Utils.writeContents(new File(_filename),
                 Utils.readContentsAsString(new File(BLOB_DIR + hash())));
     }

@@ -95,7 +95,6 @@ public class Gitlet {
      */
     public void add(String[] operands) {
         checkOperands(operands, 1);
-//        _branch.add(operands[0]);
         Stage.add(operands[0], _branch.head());
     }
 
@@ -114,7 +113,6 @@ public class Gitlet {
      */
     public void remove(String[] operands) {
         checkOperands(operands, 1);
-//        _branch.remove(operands[0]);
         Stage.remove(operands[0], _branch.head());
     }
 
@@ -194,6 +192,9 @@ public class Gitlet {
         System.out.println(header);
         Collections.sort(list);
         for (String entry: list) {
+            if (entry.equals("")) {
+                continue;
+            }
             if (asterisk && _branch.name().equals(entry)) {
                 System.out.print("*");
             }
@@ -236,7 +237,7 @@ public class Gitlet {
         if (!blobs.containsKey(filename)) {
             throw error("File does not exist in that commit.");
         }
-        blobs.get(filename).restore();
+        blobs.get(filename).checkout();
     }
 
     /** Checks out a Branch.
@@ -260,7 +261,7 @@ public class Gitlet {
                 Utils.restrictedDelete(filename);
             }
         }
-        commit.restore();
+        commit.checkout();
         _branch.writeBranch();
         _branch = Branch.readBranch(branchName);
         Stage.reset();
@@ -322,7 +323,7 @@ public class Gitlet {
         if (_branch.name().equals(operands[0])) {
             throw error("Cannot merge a branch with itself.");
         }
-
+        _branch.merge(Branch.readBranch(operands[0]));
     }
 
     /** Mapping of commands to methods that process them. */

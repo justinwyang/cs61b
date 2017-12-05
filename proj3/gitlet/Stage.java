@@ -12,7 +12,9 @@ import static gitlet.Utils.error;
  */
 public class Stage {
 
-    /** Clears both the staged and empty files, or initializes them if they are null. */
+    /** Clears both the staged and empty files,
+     * or initializes them if they are null.
+     */
     public static void reset() {
         _staged = new HashMap<>();
         _removed = new HashSet<>();
