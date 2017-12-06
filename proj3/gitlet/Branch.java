@@ -35,7 +35,7 @@ public class Branch implements Serializable {
         }
         if (Stage.staged().isEmpty() && Stage.removed().isEmpty()) {
             throw error("No changes added to the commit.");
-        }g
+        }
 
         for (Map.Entry<String, Blob> entry: tracked().entrySet()) {
             if (!Stage.staged().containsKey(entry.getKey())) {
