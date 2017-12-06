@@ -37,7 +37,7 @@ public class Commit implements Serializable {
     public Commit(String parent, String mergedParent,
                   String message, HashMap<String, Blob> tracked) {
         this._parent = parent;
-        this._mergedParent = _mergedParent;
+        this._mergedParent = mergedParent;
         this._message = message;
         this._date = new Date();
         this._tracked = tracked;
