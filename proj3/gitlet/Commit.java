@@ -181,6 +181,7 @@ public class Commit implements Serializable {
         }
         contents += ">>>>>>>\n";
         Utils.writeContents(new File(filename), contents);
+        Stage.add(filename, current);
     }
 
     /** Reads in a Commit by its CommitID and returns it.
