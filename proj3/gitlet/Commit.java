@@ -71,7 +71,7 @@ public class Commit implements Serializable {
     public String toString() {
         String str = "===" + "\n" + "commit " + _commitID + "\n";
         if (_mergedParent != null) {
-            str += "Merge: " + _parent.substring(0, 7)
+            str += "Merge: " + _parent.substring(0, 7) + " "
                     + _mergedParent.substring(0, 7) + "\n";
         }
         str += String.format("Date: %ta %tb %te %tT %tY %tz\n",
@@ -143,7 +143,7 @@ public class Commit implements Serializable {
             commits.add(current.commitID());
         }
         for (; other != null; other = other.parent()) {
-            if (commits.contains(other)) {
+            if (commits.contains(other.commitID())) {
                 break;
             }
         }

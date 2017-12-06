@@ -76,7 +76,7 @@ public class Branch implements Serializable {
 
         boolean conflict = mergeHelper(current, other, split);
         commit("Merged " + otherBranch.name()
-                + " into" + name() + ".", other.commitID());
+                + " into " + name() + ".", other.commitID());
         return conflict;
     }
 
