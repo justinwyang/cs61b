@@ -47,15 +47,14 @@ public class Gitlet {
 
     /** Reads in the metadata to run Gitlet. */
     public void read() {
-        _branch = Branch.readBranch(Utils.readObject
-                (new File(GITLET_DIR + ".branch"), String.class));
+        _branch = readCurBranch();
         Stage.read();
     }
 
     /** Saves the metadata for the next run of Gitlet. */
     public void write() {
         _branch.writeBranch();
-        Utils.writeObject(new File(GITLET_DIR + ".branch"), _branch.name());
+        Utils.writeContents(new File(GITLET_DIR + ".branch"), _branch.name());
         Stage.write();
     }
 
@@ -84,6 +83,8 @@ public class Gitlet {
         commitDir.mkdir();
         File blobDir = new File(Blob.BLOB_DIR);
         blobDir.mkdir();
+        File remoteDir = new File(Remote.REMOTE_DIR);
+        remoteDir.mkdir();
         Commit head = new Commit();
         _branch = new Branch(head, "master");
         Stage.reset();
@@ -231,7 +232,7 @@ public class Gitlet {
      * @param prefix The CommitID prefix to checkout from
      * @param filename The filename to checkout
      */
-    public void checkoutCommitFile(String prefix, String filename) {
+    private void checkoutCommitFile(String prefix, String filename) {
         String found = Commit.findCommit(prefix);
         HashMap<String, Blob> blobs = Commit.readCommit(found).tracked();
         if (!blobs.containsKey(filename)) {
@@ -320,6 +321,71 @@ public class Gitlet {
         }
     }
 
+    /** Saves the given login information under the given remote name.
+     *
+     * @param operands operands for addRemote
+     */
+    public void addRemote(String[] operands) {
+        checkOperands(operands, 2);
+        Remote.add(operands[0], operands[1]);
+    }
+
+    /** Saves the given login information under the given remote name.
+     *
+     * @param operands operands for rmRemote
+     */
+    public void rmRemote(String[] operands) {
+        checkOperands(operands, 1);
+        Remote.remove(operands[0]);
+    }
+
+    /** Attempts to append the current branch's commits to the
+     *  end of the given branch at the given remote repository.
+     *
+     * @param operands operands for push
+     */
+    public void push(String[] operands) {
+        checkOperands(operands, 2);
+        Remote.push(operands[0], operands[1]);
+    }
+
+    /** Brings down commits from the remote Gitlet
+     *  repository into the local Gitlet repository.
+     *
+     * @param operands operands for fetch
+     */
+    public void fetch(String[] operands) {
+        checkOperands(operands, 2);
+        Remote.fetch(operands[0], operands[1]);
+    }
+
+    /** Fetches the given branch and merges it into the current branch.
+     *
+     * @param operands operands for pull
+     */
+    public void pull(String[] operands) {
+        checkOperands(operands, 2);
+        Remote.pull(operands[0], operands[1]);
+    }
+
+    /** Returns the current Branch from the given repository.
+     *
+     * @param repoPath the path of the repository
+     * @return the current Branch
+     */
+    public static Branch readCurBranch(String repoPath) {
+        return Branch.readBranch(Utils.readContentsAsString
+                (new File(repoPath + ".branch")));
+    }
+
+    /** Returns the current Branch from the current repository.
+     *
+     * @return the current Branch
+     */
+    public static Branch readCurBranch() {
+        return readCurBranch(GITLET_DIR);
+    }
+
     /** Mapping of commands to methods that process them. */
     private final HashMap<String, Consumer<String[]>> _commands =
             new HashMap<>(); {
@@ -336,6 +402,11 @@ public class Gitlet {
         _commands.put("rm-branch", this::rmBranch);
         _commands.put("reset", this::reset);
         _commands.put("merge", this::merge);
+        _commands.put("add-remote", this::addRemote);
+        _commands.put("rm-remote", this::rmRemote);
+        _commands.put("push", this::push);
+        _commands.put("fetch", this::fetch);
+        _commands.put("pull", this::pull);
     }
 
     /** The current Branch. */

@@ -127,14 +127,12 @@ public class Branch implements Serializable {
                     Commit.mergeConflict(current, other, filename);
                     conflict = true;
                 }
-            } else {
-                if (!current.tracked().containsKey(filename)
-                        && other.tracked().containsKey(filename)) {
+            } else if (other.tracked().containsKey(filename)) {
+                if (!current.tracked().containsKey(filename)) {
                     other.tracked().get(filename).checkout();
                     Stage.add(filename, current);
                 }
                 if (current.tracked().containsKey(filename)
-                        && other.tracked().containsKey(filename)
                         && !current.tracked().get(filename).
                         equals(other.tracked().get(filename))) {
                     Commit.mergeConflict(current, other, filename);
@@ -172,12 +170,21 @@ public class Branch implements Serializable {
         return _name;
     }
 
-    /** Returns the head Commit.
+    /** Returns the head Commit from the given repository.
+     *
+     * @param repoPath the path of the repository
+     * @return the head Commit
+     */
+    public Commit head(String repoPath) {
+        return Commit.readCommit(_headID, repoPath);
+    }
+
+    /** Returns the head Commit from the current repository.
      *
      * @return the head Commit
      */
     public Commit head() {
-        return Commit.readCommit(_headID);
+        return head(Gitlet.GITLET_DIR);
     }
 
     /** Sets the headID to a new value.
@@ -248,28 +255,60 @@ public class Branch implements Serializable {
         return untracked;
     }
 
-    /** Returns whether a Branch with the given name exists.
+    /** Returns whether a Branch with the given
+     *  name exists in the given repository.
+     *
+     * @param branchName the Branch name to check
+     * @param repoPath the path of the repository
+     * @return whether the branch exists or not
+     */
+    public static boolean exists(String branchName, String repoPath) {
+        return new File(repoPath + "branches/" + branchName).exists();
+    }
+
+    /** Returns whether a Branch with the given
+     *  name exists in the current repository.
      *
      * @param branchName the Branch name to check
      * @return whether the branch exists or not
      */
     public static boolean exists(String branchName) {
-        return new File(BRANCH_DIR + branchName).exists();
+        return exists(branchName, Gitlet.GITLET_DIR);
     }
 
-    /** Reads in a Branch by its name and returns it.
+    /** Reads in a Branch from the given repository
+     *  by its name and returns it.
+     *
+     * @param branchName the name of the Branch to read
+     * @param repoPath the path of the repository
+     * @return the unserialized Branch
+     */
+    public static Branch readBranch(String branchName, String repoPath) {
+        return Utils.readObject(new File(repoPath + "branches/" + branchName),
+                Branch.class);
+    }
+
+    /** Reads in a Branch from the current repository
+     *  by its name and returns it.
      *
      * @param branchName the name of the Branch to read
      * @return the unserialized Branch
      */
     public static Branch readBranch(String branchName) {
-        return Utils.readObject(new File(BRANCH_DIR + branchName),
-                Branch.class);
+        return readBranch(branchName, Gitlet.GITLET_DIR);
     }
 
-    /** Serializes the current Branch. */
+    /** Serializes the current Branch in the given repository.
+     *
+     * @param repoPath the path of the repository
+     */
+    public void writeBranch(String repoPath) {
+        Utils.writeObject(new File(repoPath + "branches/" + _name), this);
+    }
+
+    /** Serializes the current Branch in the current repository. */
     public void writeBranch() {
-        Utils.writeObject(new File(BRANCH_DIR + _name), this);
+        writeBranch(Gitlet.GITLET_DIR);
     }
 
     /** The Branch's name, which it will be identified by. */
@@ -279,5 +318,5 @@ public class Branch implements Serializable {
     private String _headID;
 
     /** The path that Gitlet Branches are stored under. */
-    static final String BRANCH_DIR = Gitlet.GITLET_DIR + "branch/";
+    static final String BRANCH_DIR = Gitlet.GITLET_DIR + "branches/";
 }

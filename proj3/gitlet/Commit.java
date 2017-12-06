@@ -46,15 +46,24 @@ public class Commit implements Serializable {
         writeCommit();
     }
 
-    /** Returns the parent Commit.
+    /** Returns the parent Commit from the given repository.
+     *
+     * @param repoPath the path of the repository
+     * @return the parent commit
+     */
+    public Commit parent(String repoPath) {
+        if (_parent == null) {
+            return null;
+        }
+        return readCommit(_parent, repoPath);
+    }
+
+    /** Returns the parent Commit from the current repository.
      *
      * @return the parent commit
      */
     public Commit parent() {
-        if (_parent == null) {
-            return null;
-        }
-        return readCommit(_parent);
+        return parent(Gitlet.GITLET_DIR);
     }
 
     /** Restores the contents of the commit to the working directory. */
@@ -184,18 +193,60 @@ public class Commit implements Serializable {
         Stage.add(filename, current);
     }
 
-    /** Reads in a Commit by its CommitID and returns it.
+    /** Returns whether a Commit with the given
+     *  CommitID exists in the given repository.
+     *
+     * @param commitID the CommitID to check
+     * @param repoPath the path of the repository
+     * @return whether the Commit exists or not
+     */
+    public static boolean exists(String commitID, String repoPath) {
+        return new File(repoPath + "commits/" + commitID).exists();
+    }
+
+    /** Returns whether a Commit with the given
+     *  CommitID exists in the current repository.
+     *
+     * @param commitID the Branch name to check
+     * @return whether the branch exists or not
+     */
+    public static boolean exists(String commitID) {
+        return exists(commitID, Gitlet.GITLET_DIR);
+    }
+
+    /** Reads in a Commit by its CommitID from
+     * the given repository and returns it.
+     *
+     * @param commitID the CommitID of the Commit to read
+     * @param repoPath the path of the repository
+     * @return the unserialized Commit
+     */
+    public static Commit readCommit(String commitID, String repoPath) {
+        return Utils.readObject(new File(repoPath
+                + "commits/" + commitID), Commit.class);
+    }
+
+    /** Reads in a Commit by its CommitID from
+     * the curre t repository and returns it.
      *
      * @param commitID the CommitID of the Commit to read
      * @return the unserialized Commit
      */
     public static Commit readCommit(String commitID) {
-        return Utils.readObject(new File(COMMIT_DIR + commitID), Commit.class);
+        return readCommit(commitID, Gitlet.GITLET_DIR);
     }
 
-    /** Serializes the current Commit. */
+    /** Serializes the current Commit in the given repository.
+     *
+     * @param repoPath the path of the repository
+     */
+    public void writeCommit(String repoPath) {
+        Utils.writeObject(new File(repoPath + "commits/" + _commitID), this);
+    }
+
+    /** Serializes the current Commit in the current repository. */
     public void writeCommit() {
-        Utils.writeObject(new File(COMMIT_DIR + _commitID), this);
+        writeCommit(Gitlet.GITLET_DIR);
     }
 
     @Override
