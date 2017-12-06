@@ -180,7 +180,7 @@ public class Commit implements Serializable {
             contents += other.tracked().get(filename).contents();
         }
         contents += ">>>>>>>\n";
-        Utils.writeObject(new File(filename), contents);
+        Utils.writeContents(new File(filename), contents);
     }
 
     /** Reads in a Commit by its CommitID and returns it.
