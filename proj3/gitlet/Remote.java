@@ -25,6 +25,7 @@ public final class Remote {
             throw error("A remote with that name already exists.");
         }
         Utils.writeContents(file, path + "/");
+        new File(Gitlet.GITLET_DIR + "branches/" + name).mkdir();
     }
 
     /** Removes information associated with the given remote name.
@@ -37,6 +38,7 @@ public final class Remote {
             throw error("A remote with that name does not exist.");
         }
         file.delete();
+        new File(Gitlet.GITLET_DIR + "branches/" + name).delete();
     }
 
     /** Removes information associated with the given remote name.
@@ -73,6 +75,7 @@ public final class Remote {
         }
         for (Commit history = curHead;
              !history.equals(remoteHead); history = history.parent()) {
+            history.refreshBlobs(Gitlet.GITLET_DIR, repoPath);
             history.writeCommit(repoPath);
         }
         remoteBranch.setHead(curHead.commitID());
@@ -102,7 +105,8 @@ public final class Remote {
         Commit remoteHead = remoteBranch.head(repoPath);
         for (Commit history = remoteHead;
              history != null; history = history.parent(repoPath)) {
-            if (Commit.exists(history.commitID())) {
+            if (!Commit.exists(history.commitID())) {
+                history.refreshBlobs(repoPath, Gitlet.GITLET_DIR);
                 history.writeCommit();
             }
         }
@@ -116,17 +120,6 @@ public final class Remote {
             fetchBranch.setHead(remoteHead.commitID());
         }
         fetchBranch.writeBranch();
-    }
-
-    /** Fetches the given branch and merges it into the current branch.
-     *
-     * @param name the name of the remote repository
-     * @param branchName the branch to pull
-     */
-    public static void pull(String name, String branchName) {
-        fetch(name, branchName);
-        Gitlet.readCurBranch().merge(Branch.readBranch(name
-                + "/" + branchName));
     }
 
     /** The path that Remote repository names are stored under. */

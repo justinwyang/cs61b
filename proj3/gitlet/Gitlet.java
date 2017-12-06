@@ -365,7 +365,9 @@ public class Gitlet {
      */
     public void pull(String[] operands) {
         checkOperands(operands, 2);
-        Remote.pull(operands[0], operands[1]);
+        Remote.fetch(operands[0], operands[1]);
+        _branch.merge(Branch.readBranch(operands[0]
+                + "/" + operands[1]));
     }
 
     /** Returns the current Branch from the given repository.

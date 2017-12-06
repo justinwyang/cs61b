@@ -17,8 +17,21 @@ public class Blob implements Serializable {
     public Blob(String filename) {
         this._filename = filename;
         this._hash = sha1(filename);
-        Utils.writeContents(new File(BLOB_DIR + hash()),
-                Utils.readContentsAsString(new File(_filename)));
+        write(Gitlet.GITLET_DIR, Gitlet.GITLET_DIR);
+    }
+
+    /** Writes the contents of the Blob from
+     *  one repository to the other.
+     *
+     * @param fromRepo the path of the from repository
+     * @param toRepo the path of the to repository
+     */
+    public void write(String fromRepo, String toRepo) {
+        fromRepo = fromRepo.substring(0, fromRepo.length() - 8);
+        if (!new File(toRepo + hash()).exists()) {
+            Utils.writeContents(new File(toRepo + "blobs/" + hash()),
+                    Utils.readContentsAsString(new File(fromRepo + _filename)));
+        }
     }
 
     /** Restores the version saved in the current

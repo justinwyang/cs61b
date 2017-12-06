@@ -73,6 +73,17 @@ public class Commit implements Serializable {
         }
     }
 
+    /** Adds absent blobs from one repository to the other.
+     *
+     * @param fromRepo the path of the from repository
+     * @param toRepo the path of the to repository
+     */
+    public void refreshBlobs(String fromRepo, String toRepo) {
+        for (Blob blob: _tracked.values()) {
+            blob.write(fromRepo, toRepo);
+        }
+    }
+
     /** Returns the String representation.
      *
      * @return the String representation
