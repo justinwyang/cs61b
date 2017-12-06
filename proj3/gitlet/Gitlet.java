@@ -104,7 +104,7 @@ public class Gitlet {
      */
     public void commit(String[] operands) {
         checkOperands(operands, 1);
-        _branch.commit(operands[0]);
+        _branch.commit(operands[0], null);
     }
 
     /** Performs a rm command.
@@ -315,7 +315,9 @@ public class Gitlet {
         if (_branch.name().equals(operands[0])) {
             throw error("Cannot merge a branch with itself.");
         }
-        _branch.merge(Branch.readBranch(operands[0]));
+        if (_branch.merge(Branch.readBranch(operands[0]))) {
+            System.out.println("Encountered a merge conflict.");
+        }
     }
 
     /** Mapping of commands to methods that process them. */

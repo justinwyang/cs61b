@@ -150,40 +150,37 @@ public class Commit implements Serializable {
         return other;
     }
 
-    public HashSet<String> removed(Commit split) {
-        HashSet<String> removed = new HashSet<>();
-        for (String filename: split.tracked().keySet()) {
-            if (!tracked().containsKey(filename)) {
-                removed.add(filename);
-            }
+    /** Returns the union of all the filenames of the given commits.
+     *
+     * @param commits the commits to take filenames from
+     * @return the union of all the filenames
+     */
+    public static HashSet<String> union(Commit... commits) {
+        HashSet<String> union = new HashSet<>();
+        for (Commit commit: commits) {
+            union.addAll(commit.tracked().keySet());
         }
-        return removed;
+        return union;
     }
 
-    public HashSet<String> added(Commit split) {
-        HashSet<String> added = new HashSet<>();
-        for (String filename: tracked().keySet()) {
-            if (!split.tracked().containsKey(filename)) {
-                added.add(filename);
-            }
+    /** Writes a file that is in merge conflict.
+     *
+     * @param current the current Commit
+     * @param other the other Commit
+     * @param filename the filename in question
+     */
+    public static void mergeConflict(Commit current,
+                                     Commit other, String filename) {
+        String contents = "<<<<<<< HEAD\n";
+        if (current.tracked().containsKey(filename)) {
+            contents += current.tracked().get(filename).contents();
         }
-        return added;
-    }
-
-    public HashSet<String> modified(Commit split) {
-        HashSet<String> modified = new HashSet<>();
-        for (String filename: tracked().keySet()) {
-            if (split.tracked().containsKey(filename)
-                    && !split.tracked().get(filename).equals(tracked().get(filename))) {
-                modified.add(filename);
-            }
+        contents += "=======\n";
+        if (other.tracked().containsKey(filename)) {
+            contents += other.tracked().get(filename).contents();
         }
-        return modified;
-    }
-
-    public static void conflict(Commit cur, Commit other, String filename) {
-        String =
-        Utils.writeObject(new File(filename), cur.tracked().get(filename).conte);
+        contents += ">>>>>>>\n";
+        Utils.writeObject(new File(filename), contents);
     }
 
     /** Reads in a Commit by its CommitID and returns it.

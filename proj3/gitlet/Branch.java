@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static gitlet.Utils.error;
 
@@ -28,8 +27,9 @@ public class Branch implements Serializable {
     /** Creates a Commit of the Branch in its current state.
      *
      * @param message the commit message
+     * @param mergedParent the CommitID merged in (if it exists)
      */
-    public void commit(String message) {
+    public void commit(String message, String mergedParent) {
         if (message == null || message.trim().equals("")) {
             throw error("Please enter a commit message.");
         }
@@ -47,7 +47,8 @@ public class Branch implements Serializable {
             Stage.staged().remove(filename);
         }
 
-        Commit next = new Commit(_headID, null, message, Stage.staged());
+        Commit next = new Commit(_headID,
+                mergedParent, message, Stage.staged());
         _headID = next.commitID();
         Stage.reset();
     }
@@ -55,40 +56,93 @@ public class Branch implements Serializable {
     /** Performs a merge operation.
      *
      * @param otherBranch the other Branch to merge with
+     * @return whether there was a merge conflict
      */
-    public void merge(Branch otherBranch) {
+    public boolean merge(Branch otherBranch) {
         Commit current = head();
         Commit other = otherBranch.head();
         Commit split = Commit.findSplitPoint(current, other);
         if (split.equals(otherBranch.head())) {
             System.out.println("Given branch is an ancestor"
                     + " of the current branch.");
-            return;
+            return false;
         }
         if (split.equals(head())) {
             setHead(otherBranch.head().commitID());
             System.out.println("Current branch fast-forwarded.");
-            return;
+            return false;
         }
         checkOverwiteUntracked(other);
 
-        HashSet<String> currentRemoved = current.removed(split);
-        HashSet<String> currentAdded = current.added(split);
-        HashSet<String> currentModified = current.modified(split);
-        HashSet<String> otherRemoved = other.removed(split);
-        HashSet<String> otherAdded = other.added(split);
-        HashSet<String> otherModified = other.modified(split);
+        boolean conflict = mergeHelper(current, other, split);
+        commit("Merged " + otherBranch.name()
+                + " into" + name() + ".", other.commitID());
+        return conflict;
+    }
 
-        for (String filename: otherModified) {
-            if (!currentModified.contains(filename)) {
-                other.tracked().get(filename).checkout();
-                Stage.add(filename, head());
-            } else if (!current.tracked().get(filename).equals(other.tracked().get(filename))) {
-
+    /** Helper function to process a merge command.
+     *
+     * @param current the current Commit
+     * @param other the other Commit
+     * @param split the split point Commit
+     * @return whether there was a merge conflict
+     */
+    private boolean mergeHelper(Commit current, Commit other, Commit split) {
+        boolean conflict = false;
+        for (String filename: Commit.union(current, other, split)) {
+            if (split.tracked().containsKey(filename)) {
+                if (current.tracked().containsKey(filename)
+                        && other.tracked().containsKey(filename)
+                        && current.tracked().get(filename).
+                        equals(split.tracked().get(filename))
+                        && !other.tracked().get(filename).
+                        equals(split.tracked().get(filename))) {
+                    other.tracked().get(filename).checkout();
+                    Stage.add(filename, current);
+                }
+                if (current.tracked().containsKey(filename)
+                        && current.tracked().get(filename).
+                        equals(split.tracked().get(filename))
+                        && !other.tracked().containsKey(filename)) {
+                    Stage.remove(filename, current);
+                }
+                if (current.tracked().containsKey(filename)
+                        && other.tracked().containsKey(filename)
+                        && !current.tracked().get(filename).
+                        equals(other.tracked().get(filename))) {
+                    Commit.mergeConflict(current, other, filename);
+                    conflict = true;
+                }
+                if (current.tracked().containsKey(filename)
+                        && !other.tracked().containsKey(filename)
+                        && !current.tracked().get(filename).
+                        equals(split.tracked().get(filename))) {
+                    Commit.mergeConflict(current, other, filename);
+                    conflict = true;
+                }
+                if (!current.tracked().containsKey(filename)
+                        && other.tracked().containsKey(filename)
+                        && !other.tracked().get(filename).
+                        equals(split.tracked().get(filename))) {
+                    Commit.mergeConflict(current, other, filename);
+                    conflict = true;
+                }
+            } else {
+                if (!current.tracked().containsKey(filename)
+                        && other.tracked().containsKey(filename)) {
+                    other.tracked().get(filename).checkout();
+                    Stage.add(filename, current);
+                }
+                if (current.tracked().containsKey(filename)
+                        && other.tracked().containsKey(filename)
+                        && !current.tracked().get(filename).
+                        equals(other.tracked().get(filename))) {
+                    Commit.mergeConflict(current, other, filename);
+                    conflict = true;
+                }
             }
         }
-
-
+        return conflict;
     }
 
     /** Checks to see if a Commit checkout will overwrite
