@@ -38,7 +38,6 @@ public final class Remote {
             throw error("A remote with that name does not exist.");
         }
         file.delete();
-        new File(Gitlet.GITLET_DIR + "branches/" + name).delete();
     }
 
     /** Removes information associated with the given remote name.
